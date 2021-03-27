@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./",
+        "paths": {
+            "@base/*": ["src/*"],
+            "@core/*": ["src/core/*"],
+            "@entity/*": ["src/core/entities/*"],
+            "@constant/*": ["src/core/constants/*"],
+            "@guard/*": ["src/core/constant/guards/*"],
+            "@pipe/*": ["src/core/constant/pipes/*"],
+            "@module/*": ["src/modules/*"],
+        }
+    }
+}
