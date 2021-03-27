@@ -13,6 +13,7 @@ async function bootstrap() {
   // cors
   app.enableCors({
     credentials: true,
+    origin: true
   });
 
   // rate limiter

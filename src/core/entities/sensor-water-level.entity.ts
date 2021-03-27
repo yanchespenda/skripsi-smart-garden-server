@@ -11,8 +11,8 @@ export class SensorWaterLevel {
   level: number;
 
   @CreateDateColumn()
-  createdAt: string;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: string;
+  updatedAt: Date;
 }

@@ -13,8 +13,8 @@ export class SensorDHTHumidity {
   humidity: number;
 
   @CreateDateColumn()
-  createdAt: string;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: string;
+  updatedAt: Date;
 }
