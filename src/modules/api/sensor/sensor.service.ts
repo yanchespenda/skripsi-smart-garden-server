@@ -70,12 +70,7 @@ export class SensorService {
 
   generateChartJsData(source: any, fieldValue: string, dateFormat: number): any {
     const getDatesEmpty = this.generateEmptyDataByDateFormat(dateFormat);
-    let returnData: ChartJsFormatDatasets[] = [
-      {
-        data: [],
-        label: ''
-      }
-    ];
+    let returnData: ChartJsFormatDatasets[] = [];
     let classifiedByDate: ClassifiedData[] = [];
     getDatesEmpty.forEach(date => {
       classifiedByDate.push({

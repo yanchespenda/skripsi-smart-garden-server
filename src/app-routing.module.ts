@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { RouterModule, Routes } from 'nest-router';
 import { AuthModule } from '@modules/auth/auth.module';
 import { SensorModule } from './modules/api/sensor/sensor.module';
+import { ActionModule } from './modules/api/action/action.module';
 
 
 export const routes: Routes = [
@@ -11,6 +12,10 @@ export const routes: Routes = [
       {
         path: 'sensor',
         module: SensorModule,
+      },
+      {
+        path: 'action',
+        module: ActionModule,
       }
     ]
   },

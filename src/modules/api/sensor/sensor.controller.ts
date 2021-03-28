@@ -62,7 +62,7 @@ export class SensorController {
 
         let datasets: ChartJsFormatDatasets = {
           data: [],
-          label: 'Celcius'
+          label: 'Current'
         }
         getData.forEach(item => {
           datasets.data.push(item.temperature);
@@ -132,7 +132,7 @@ export class SensorController {
 
         let datasets: ChartJsFormatDatasets = {
           data: [],
-          label: 'Celcius'
+          label: 'Current'
         }
         getData.forEach(item => {
           datasets.data.push(item.temperature);
@@ -167,7 +167,7 @@ export class SensorController {
 
         let datasets: ChartJsFormatDatasets = {
           data: [],
-          label: 'Celcius'
+          label: 'Current'
         }
         getData.forEach(item => {
           datasets.data.push(item.moisture);
@@ -202,7 +202,7 @@ export class SensorController {
 
         let datasets: ChartJsFormatDatasets = {
           data: [],
-          label: 'Celcius'
+          label: 'Current'
         }
         getData.forEach(item => {
           datasets.data.push(item.level);

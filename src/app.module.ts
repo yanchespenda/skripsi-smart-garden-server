@@ -9,6 +9,7 @@ import { AuthModule } from '@modules/auth/auth.module';
 import { MqttHandlerModule } from '@modules/mqtt-handler/mqtt-handler.module';
 import { UserModule } from './modules/user/user.module';
 import { SensorModule } from './modules/api/sensor/sensor.module';
+import { ActionModule } from './modules/api/action/action.module';
 
 import { AppCronService } from './services/app-cron/app-cron.service';
 
@@ -53,6 +54,7 @@ import { SensorWaterLevel } from '@entities/sensor-water-level.entity';
     AuthModule,
     MqttHandlerModule,
     SensorModule,
+    ActionModule,
   ],
   controllers: [AppController],
   providers: [
