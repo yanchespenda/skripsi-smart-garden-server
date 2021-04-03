@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { SensorService } from './sensor.service';
 import { DateTime } from "luxon";
 
@@ -62,7 +62,7 @@ export class SensorController {
 
         let datasets: ChartJsFormatDatasets = {
           data: [],
-          label: 'Current'
+          label: 'Nilai'
         }
         getData.forEach(item => {
           datasets.data.push(item.temperature);
@@ -132,7 +132,7 @@ export class SensorController {
 
         let datasets: ChartJsFormatDatasets = {
           data: [],
-          label: 'Current'
+          label: 'Nilai'
         }
         getData.forEach(item => {
           datasets.data.push(item.temperature);
@@ -167,7 +167,7 @@ export class SensorController {
 
         let datasets: ChartJsFormatDatasets = {
           data: [],
-          label: 'Current'
+          label: 'Nilai'
         }
         getData.forEach(item => {
           datasets.data.push(item.moisture);
@@ -202,7 +202,7 @@ export class SensorController {
 
         let datasets: ChartJsFormatDatasets = {
           data: [],
-          label: 'Current'
+          label: 'Nilai'
         }
         getData.forEach(item => {
           datasets.data.push(item.level);

@@ -9,6 +9,7 @@ import { SensorDHTHumidity } from '@entities/sensor-dht-humidity.entity';
 import { SensorDHTTemperature } from '@entities/sensor-dht-temperature.entity';
 import { SensorSoilMoisture } from '@entities/sensor-soil-moisture.entity';
 import { SensorSoilTemperature } from '@entities/sensor-soil-temperature.entity';
+import { SensorWaterLevel } from '@entities/sensor-water-level.entity';
 
 import { mqttProviders } from './mqtt-handler.providers';
 
@@ -18,7 +19,8 @@ import { mqttProviders } from './mqtt-handler.providers';
       SensorDHTHumidity,
       SensorDHTTemperature,
       SensorSoilMoisture,
-      SensorSoilTemperature
+      SensorSoilTemperature,
+      SensorWaterLevel
     ]),
 
     MqttModule,

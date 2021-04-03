@@ -138,17 +138,17 @@ export class SensorService {
 
     returnData.push({
       data: currentAverage,
-      label: 'Average'
+      label: 'Rata rata'
     });
 
     returnData.push({
       data: currentMin,
-      label: 'Min'
+      label: 'Terkecil'
     });
 
     returnData.push({
       data: currentMax,
-      label: 'Max'
+      label: 'Terbesar'
     });
     return returnData;
   }

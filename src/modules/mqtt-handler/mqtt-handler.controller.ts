@@ -57,6 +57,6 @@ export class MqttHandlerController {
     this.logger.debug(context.getTopic(), 'Topic');
     this.logger.debug(data, 'Data');
 
-    // this.mqttHandlerService.saveTemperature(data);
+    this.mqttHandlerService.saveWaterLevel(data);
   }
 }

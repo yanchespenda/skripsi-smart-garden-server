@@ -6,6 +6,7 @@ import { SensorDHTHumidity } from '@entities/sensor-dht-humidity.entity';
 import { SensorDHTTemperature } from '@entities/sensor-dht-temperature.entity';
 import { SensorSoilMoisture } from '@entities/sensor-soil-moisture.entity';
 import { SensorSoilTemperature } from '@entities/sensor-soil-temperature.entity';
+import { SensorWaterLevel } from '@entities/sensor-water-level.entity';
 
 
 @Injectable()
@@ -15,6 +16,7 @@ export class MqttHandlerService {
     @InjectRepository(SensorDHTTemperature) private sensorDHTTemperatureRepository: Repository<SensorDHTTemperature>,
     @InjectRepository(SensorSoilMoisture) private sensorSoilMoistureRepository: Repository<SensorSoilMoisture>,
     @InjectRepository(SensorSoilTemperature) private sensorSoilTemperatureRepository: Repository<SensorSoilTemperature>,
+    @InjectRepository(SensorWaterLevel) private sensorWaterLevelRepository: Repository<SensorWaterLevel>,
   ) {}
 
   async saveDHTHumidity(value: number): Promise<void> {
@@ -39,5 +41,11 @@ export class MqttHandlerService {
     const mdlData = new SensorSoilMoisture();
     mdlData.moisture = value;
     await this.sensorSoilMoistureRepository.save(mdlData);
+  }
+
+  async saveWaterLevel(value: number): Promise<void> {
+    const mdlData = new SensorWaterLevel();
+    mdlData.level = value;
+    await this.sensorWaterLevelRepository.save(mdlData);
   }
 }
