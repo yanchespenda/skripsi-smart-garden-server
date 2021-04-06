@@ -32,8 +32,11 @@ async function bootstrap() {
     transport: Transport.MQTT,
     options: {
       url: MQTT_CONFIG.url,
+      // ca: MQTT_CONFIG.ca,
+      // cert: MQTT_CONFIG.cert,
       username: MQTT_CONFIG.username,
       password: MQTT_CONFIG.password,
+      protocol: (MQTT_CONFIG.protocol) as any,
       // // url: 'mqtt://localhost:1883',
       // // url: process.env.MQTT_SERVER,
       // hostname: 'u2b6d465.en.emqx.cloud',
