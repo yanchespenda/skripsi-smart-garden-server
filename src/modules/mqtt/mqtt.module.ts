@@ -11,9 +11,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         transport: Transport.MQTT,
         options: {
           url: MQTT_CONFIG.url,
-          // ca: MQTT_CONFIG.ca,
-          // cert: MQTT_CONFIG.cert,
-
           username: MQTT_CONFIG.username,
           password: MQTT_CONFIG.password,
           protocol: (MQTT_CONFIG.protocol) as any,
