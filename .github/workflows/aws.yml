@@ -23,7 +23,7 @@ jobs:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.AWS_KEY }}
-          script: deploy
+          script: cd ${{ secrets.PROJECT_PATH }} && deploy.sh
 
       # - name: Use Node.js ${{ matrix.node-version }}
       #   uses: actions/setup-node@v1
