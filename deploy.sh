@@ -6,8 +6,8 @@ sudo pm2 kill
 echo "Jump to app folder"
 cd /home/project
 
-echo "Update app from Git"
-git pull origin main
+# echo "Update app from Git"
+# git pull origin main
 
 echo "Install app dependencies"
 sudo rm -rf node_modules
