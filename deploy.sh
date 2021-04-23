@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Kill all the running PM2 actions"
-sudo pm2 kill
+pm2 kill
 
 echo "Jump to app folder"
 cd /home/project
@@ -11,11 +11,11 @@ cd /home/project
 
 echo "Install app dependencies"
 sudo rm -rf node_modules
-sudo yarn install
+yarn install
 
 echo "Build your app"
-sudo yarn build
+yarn build
 
 echo "Run new PM2 action"
 # sudo cp /home/project/ecosystem.json ecosystem.json
-sudo pm2 start ecosystem.json
+pm2 start ecosystem.json
