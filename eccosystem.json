@@ -1,0 +1,14 @@
+{
+    "apps": [{
+        "name": "skripsi-server",
+        "script": "yarn",
+        "args": "run start",
+        "watch": false,
+        "cwd": "/home/project/",
+        "out_file": "/home/project-log/hooker.out.log",
+        "err_file": "/home/project-log/hooker.err.log",
+        "merge_logs": true,
+        "instances": 1,
+        "exec_mode": "cluster"
+    }]
+}
