@@ -1,62 +1,101 @@
-import { Controller, Inject, Logger } from '@nestjs/common';
-import { ClientProxy, Ctx, MessagePattern, MqttContext, Payload } from '@nestjs/microservices';
+import { Controller, Logger } from '@nestjs/common';
+import { Ctx, MessagePattern, MqttContext, Payload } from '@nestjs/microservices';
 import { MqttHandlerService } from './mqtt-handler.service';
 import {
-  MQTT_SERVICE,
   MQTT_TOPIC_DHT_HUMIDITY,
   MQTT_TOPIC_DHT_TEMPERATURE,
   MQTT_TOPIC_SOIL_MOISTURE,
-  MQTT_TOPIC_SOIL_TEMPERATURE,
-  MQTT_TOPIC_WATER_LEVEL
+  MQTT_TOPIC_SOIL_TEMPERATURE
 } from '@constants/index';
 
 @Controller('mqtt-handler')
 export class MqttHandlerController {
+
+  /**
+   * Create logger instance
+   */
   private readonly logger = new Logger(MqttHandlerController.name);
 
+  /**
+   * Constructor
+   * 
+   * @param mqttHandlerService MQTT handler services
+   */
   constructor(
-    @Inject(MQTT_SERVICE) private clientMQTT: ClientProxy,
 
     private mqttHandlerService: MqttHandlerService,
   ) { }
 
+  /**
+   * MQTT payload validation
+   * 
+   * @param payload Object
+   * @returns boolean
+   */
+  private payloadValidation(payload: any): boolean {
+    if (payload?.token && payload?.value) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * DHT-11 Sensor Humadity
+   * 
+   * @param data Object
+   * @param context MqttContext
+   */
   @MessagePattern(MQTT_TOPIC_DHT_HUMIDITY)
   getSensorDHTHumadity(@Payload() data: any, @Ctx() context: MqttContext) {
-    this.logger.debug(context.getTopic(), 'Topic');
-    this.logger.debug(data, 'Data');
+    this.logger.debug(data, context.getTopic());
 
-    this.mqttHandlerService.saveDHTHumidity(data);
+    if (this.payloadValidation(data)) {
+      this.mqttHandlerService.saveDHTHumidity(data.token, data.value);
+    }
   }
 
+  /**
+   * DHT-11 Sensor Temperature
+   * 
+   * @param data Object
+   * @param context MqttContext
+   */
   @MessagePattern(MQTT_TOPIC_DHT_TEMPERATURE)
   getSensorDHTTemperature(@Payload() data: any, @Ctx() context: MqttContext) {
-    this.logger.debug(context.getTopic(), 'Topic');
-    this.logger.debug(data, 'Data');
+    this.logger.debug(data, context.getTopic());
 
-    this.mqttHandlerService.saveDHTTemperature(data);
+    if (this.payloadValidation(data)) {
+      this.mqttHandlerService.saveDHTTemperature(data.token, data.value);
+    }
   }
 
+  /**
+   * DS18B20 Sensor Temperature
+   * 
+   * @param data Object
+   * @param context MqttContext
+   */
   @MessagePattern(MQTT_TOPIC_SOIL_TEMPERATURE)
   getSensorSoilTemperature(@Payload() data: any, @Ctx() context: MqttContext) {
-    this.logger.debug(context.getTopic(), 'Topic');
-    this.logger.debug(data, 'Data');
+    this.logger.debug(data, context.getTopic());
 
-    this.mqttHandlerService.saveSoilTemperature(data);
+    if (this.payloadValidation(data)) {
+      this.mqttHandlerService.saveSoilTemperature(data.token, data.value);
+    }
   }
 
+  /**
+   * Soil Moisture Sensor
+   * 
+   * @param data Object
+   * @param context MqttContext
+   */
   @MessagePattern(MQTT_TOPIC_SOIL_MOISTURE)
   getSensorSoilMoisture(@Payload() data: any, @Ctx() context: MqttContext) {
-    this.logger.debug(context.getTopic(), 'Topic');
-    this.logger.debug(data, 'Data');
+    this.logger.debug(data, context.getTopic());
 
-    this.mqttHandlerService.saveSoilMoisture(data);
-  }
-
-  @MessagePattern(MQTT_TOPIC_WATER_LEVEL)
-  getSensorWaterSensor(@Payload() data: any, @Ctx() context: MqttContext) {
-    this.logger.debug(context.getTopic(), 'Topic');
-    this.logger.debug(data, 'Data');
-
-    this.mqttHandlerService.saveWaterLevel(data);
+    if (this.payloadValidation(data)) {
+      this.mqttHandlerService.saveSoilMoisture(data.token, data.value);
+    }
   }
 }

@@ -1,6 +1,7 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { SensorService } from './sensor.service';
 import { DateTime } from "luxon";
+import { AuthGuard } from '@nestjs/passport';
 
 interface ChartJsFormatDatasets {
   label: string;
@@ -12,31 +13,6 @@ interface ChartJsFormat {
   lastUpdate?: string;
 }
 
-/* 
-  dateFormatSelect: UniversalSelect[] = [
-    {
-      itemue: 1,
-      viewitemue: 'Last 30 data'
-    },
-    {
-      itemue: 2,
-      viewitemue: 'Last 1 hour (list per minutes)'
-    },
-    {
-      itemue: 3,
-      viewitemue: 'Last 24 hours (list per hour)'
-    },
-    {
-      itemue: 4,
-      viewitemue: 'Last 30 Days (list per day)'
-    },
-    {
-      itemue: 5,
-      viewitemue: 'Last 12 Months (list per month)'
-    },
-  ];
-*/
-
 @Controller()
 export class SensorController {
   constructor(
@@ -44,7 +20,8 @@ export class SensorController {
   ) { }
 
   @Get('dht-temperature')
-  async getDHTTemperature(@Query('date-format') dateFormat: number = 1) {
+  @UseGuards(AuthGuard())
+  async getDHTTemperature(@Req() req: any, @Query('date-format') dateFormat: number = 1) {
     const dateFormatParse = Number(dateFormat);
     let currentReturn: ChartJsFormat = {
       labels: [],
@@ -55,7 +32,7 @@ export class SensorController {
     if (dateFormatParse !== 1) {
       currentReturn.labels = this.sensorServices.generateEmptyDataByDateFormat(dateFormatParse);
     }
-    const getData = await this.sensorServices.getDHTTemperature(dateFormatParse);
+    const getData = await this.sensorServices.getDHTTemperature(req.user.id, dateFormatParse);
     if (getData) {
       if (dateFormatParse == 1) {
         currentReturn.labels = getData.map(item => DateTime.fromJSDate(item.createdAt).toUTC().toString());
@@ -79,7 +56,8 @@ export class SensorController {
   }
 
   @Get('dht-humidity')
-  async getDHTHumidity(@Query('date-format') dateFormat: number = 1) {
+  @UseGuards(AuthGuard())
+  async getDHTHumidity(@Req() req: any, @Query('date-format') dateFormat: number = 1) {
     const dateFormatParse = Number(dateFormat);
     let currentReturn: ChartJsFormat = {
       labels: [],
@@ -91,7 +69,7 @@ export class SensorController {
       currentReturn.labels = this.sensorServices.generateEmptyDataByDateFormat(dateFormatParse);
     }
 
-    const getData = await this.sensorServices.getDHTHumidity(dateFormatParse);
+    const getData = await this.sensorServices.getDHTHumidity(req.user.id, dateFormatParse);
     if (getData) {
       if (dateFormatParse === 1) {
         currentReturn.labels = getData.map(item => DateTime.fromJSDate(item.createdAt).toUTC().toString());
@@ -115,7 +93,8 @@ export class SensorController {
   }
 
   @Get('soil-temperature')
-  async getSoilTemperature(@Query('date-format') dateFormat: number = 1) {
+  @UseGuards(AuthGuard())
+  async getSoilTemperature(@Req() req: any, @Query('date-format') dateFormat: number = 1) {
     const dateFormatParse = Number(dateFormat);
     let currentReturn: ChartJsFormat = {
       labels: [],
@@ -125,7 +104,7 @@ export class SensorController {
     if (dateFormatParse !== 1) {
       currentReturn.labels = this.sensorServices.generateEmptyDataByDateFormat(dateFormatParse);
     }
-    const getData = await this.sensorServices.getSoilTemperature(dateFormatParse);
+    const getData = await this.sensorServices.getSoilTemperature(req.user.id, dateFormatParse);
     if (getData) {
       if (dateFormatParse === 1) {
         currentReturn.labels = getData.map(item => DateTime.fromJSDate(item.createdAt).toUTC().toString());
@@ -149,7 +128,8 @@ export class SensorController {
   }
 
   @Get('soil-moisture')
-  async getSoilMoisture(@Query('date-format') dateFormat: number = 1) {
+  @UseGuards(AuthGuard())
+  async getSoilMoisture(@Req() req: any, @Query('date-format') dateFormat: number = 1) {
     const dateFormatParse = Number(dateFormat);
     let currentReturn: ChartJsFormat = {
       labels: [],
@@ -160,7 +140,7 @@ export class SensorController {
     if (dateFormatParse !== 1) {
       currentReturn.labels = this.sensorServices.generateEmptyDataByDateFormat(dateFormatParse);
     }
-    const getData = await this.sensorServices.getSoilMoisture(dateFormatParse);
+    const getData = await this.sensorServices.getSoilMoisture(req.user.id, dateFormatParse);
     if (getData) {
       if (dateFormatParse === 1) {
         currentReturn.labels = getData.map(item => DateTime.fromJSDate(item.createdAt).toUTC().toString());
@@ -183,38 +163,4 @@ export class SensorController {
     return currentReturn;
   }
 
-  @Get('water-level')
-  async getWaterLevel(@Query('date-format') dateFormat: number = 1) {
-    const dateFormatParse = Number(dateFormat);
-    let currentReturn: ChartJsFormat = {
-      labels: [],
-      datasets: [],
-      lastUpdate: null
-    };
-
-    if (dateFormatParse !== 1) {
-      currentReturn.labels = this.sensorServices.generateEmptyDataByDateFormat(dateFormatParse);
-    }
-    const getData = await this.sensorServices.getWaterLevel(dateFormatParse);
-    if (getData) {
-      if (dateFormatParse === 1) {
-        currentReturn.labels = getData.map(item => DateTime.fromJSDate(item.createdAt).toUTC().toString());
-
-        let datasets: ChartJsFormatDatasets = {
-          data: [],
-          label: 'Nilai'
-        }
-        getData.forEach(item => {
-          datasets.data.push(item.level);
-        });
-        currentReturn.datasets.push(datasets);
-      } else {
-        currentReturn.datasets = this.sensorServices.generateChartJsData(getData, 'level', dateFormatParse);
-      }
-      const getLastUpdate = getData[0]?.createdAt;
-      currentReturn.lastUpdate = getLastUpdate ? DateTime.fromJSDate(getLastUpdate).toUTC().toString() : null;
-    }
-
-    return currentReturn;
-  }
 }

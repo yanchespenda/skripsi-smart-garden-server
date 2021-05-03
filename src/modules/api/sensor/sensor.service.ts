@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
-import { DateTime, DurationObject, DurationObjectUnits } from "luxon";
+import { DateTime, DurationObject } from "luxon";
 
 import { SensorDHTHumidity } from '@entities/sensor-dht-humidity.entity';
 import { SensorDHTTemperature } from '@entities/sensor-dht-temperature.entity';
 import { SensorSoilMoisture } from '@entities/sensor-soil-moisture.entity';
 import { SensorSoilTemperature } from '@entities/sensor-soil-temperature.entity';
-import { SensorWaterLevel } from '@entities/sensor-water-level.entity';
 
 interface ChartJsFormatDatasets {
   label: string;
@@ -210,11 +209,14 @@ export class SensorService {
     return current;
   }
 
-  async getDHTHumidity(dateFormat: number = 1) {
+  async getDHTHumidity(userId: number, dateFormat: number = 1) {
     const query = this.connection.getRepository(SensorDHTHumidity)
       .createQueryBuilder('row')
       .select('row.humidity')
       .addSelect('row.createdAt')
+      .where('row.userId = :userId', {
+        userId: userId
+      })
       .orderBy('row.createdAt', 'DESC');
 
     if (dateFormat === 1) {
@@ -228,11 +230,14 @@ export class SensorService {
     return await query.getMany();
   }
 
-  async getDHTTemperature(dateFormat: number = 1) {
+  async getDHTTemperature(userId: number, dateFormat: number = 1) {
     const query = this.connection.getRepository(SensorDHTTemperature)
       .createQueryBuilder('row')
       .select('row.temperature')
       .addSelect('row.createdAt')
+      .where('row.userId = :userId', {
+        userId: userId
+      })
       .orderBy('row.createdAt', 'DESC');
 
     if (dateFormat === 1) {
@@ -246,11 +251,14 @@ export class SensorService {
     return await query.getMany();
   }
 
-  async getSoilMoisture(dateFormat: number = 1) {
+  async getSoilMoisture(userId: number, dateFormat: number = 1) {
     const query = this.connection.getRepository(SensorSoilMoisture)
       .createQueryBuilder('row')
       .select('row.moisture')
       .addSelect('row.createdAt')
+      .where('row.userId = :userId', {
+        userId: userId
+      })
       .orderBy('row.createdAt', 'DESC');
 
     if (dateFormat === 1) {
@@ -264,11 +272,14 @@ export class SensorService {
     return await query.getMany();
   }
 
-  async getSoilTemperature(dateFormat: number = 1) {
+  async getSoilTemperature(userId: number, dateFormat: number = 1) {
     const query = this.connection.getRepository(SensorSoilTemperature)
       .createQueryBuilder('row')
       .select('row.temperature')
       .addSelect('row.createdAt')
+      .where('row.userId = :userId', {
+        userId: userId
+      })
       .orderBy('row.createdAt', 'DESC');
 
     if (dateFormat === 1) {
@@ -282,21 +293,4 @@ export class SensorService {
     return await query.getMany();
   }
 
-  async getWaterLevel(dateFormat: number = 1) {
-    const query = this.connection.getRepository(SensorWaterLevel)
-      .createQueryBuilder('row')
-      .select('row.level')
-      .addSelect('row.createdAt')
-      .orderBy('row.createdAt', 'DESC');
-
-    if (dateFormat === 1) {
-      query.limit(30)
-    } else {
-      query.where('row.createdAt > :createdAt', {
-        createdAt: DateTime.now().minus(this.convertSortToObject(dateFormat)).toSQLDate()
-      })
-    }
-
-    return await query.getMany();
-  }
 }

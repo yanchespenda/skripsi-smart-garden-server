@@ -6,46 +6,69 @@ import { SensorDHTHumidity } from '@entities/sensor-dht-humidity.entity';
 import { SensorDHTTemperature } from '@entities/sensor-dht-temperature.entity';
 import { SensorSoilMoisture } from '@entities/sensor-soil-moisture.entity';
 import { SensorSoilTemperature } from '@entities/sensor-soil-temperature.entity';
-import { SensorWaterLevel } from '@entities/sensor-water-level.entity';
+import { UserService } from '../user/user.service';
+import { UserDto } from '../user/dto/user.dto';
 
 
 @Injectable()
 export class MqttHandlerService {
   constructor(
+    private usersService: UserService,
     @InjectRepository(SensorDHTHumidity) private sensorDHTHumidityRepository: Repository<SensorDHTHumidity>,
     @InjectRepository(SensorDHTTemperature) private sensorDHTTemperatureRepository: Repository<SensorDHTTemperature>,
     @InjectRepository(SensorSoilMoisture) private sensorSoilMoistureRepository: Repository<SensorSoilMoisture>,
     @InjectRepository(SensorSoilTemperature) private sensorSoilTemperatureRepository: Repository<SensorSoilTemperature>,
-    @InjectRepository(SensorWaterLevel) private sensorWaterLevelRepository: Repository<SensorWaterLevel>,
   ) {}
 
-  async saveDHTHumidity(value: number): Promise<void> {
+  async tokenValidation(token: string): Promise<UserDto> {
+    return await this.usersService.findByMcuToken(token);
+  }
+
+  async saveDHTHumidity(token: string, value: number): Promise<void> {
+    const user = await this.tokenValidation(token);
+    if (!user) {
+      return;
+    }
+
     const mdlData = new SensorDHTHumidity();
     mdlData.humidity = value;
+    mdlData.user = user.id;
     await this.sensorDHTHumidityRepository.save(mdlData);
   }
 
-  async saveDHTTemperature(value: number): Promise<void> {
+  async saveDHTTemperature(token: string, value: number): Promise<void> {
+    const user = await this.tokenValidation(token);
+    if (!user) {
+      return;
+    }
+
     const mdlData = new SensorDHTTemperature();
     mdlData.temperature = value;
+    mdlData.user = user.id;
     await this.sensorDHTTemperatureRepository.save(mdlData);
   }
 
-  async saveSoilTemperature(value: number): Promise<void> {
+  async saveSoilTemperature(token: string, value: number): Promise<void> {
+    const user = await this.tokenValidation(token);
+    if (!user) {
+      return;
+    }
+
     const mdlData = new SensorSoilTemperature();
     mdlData.temperature = value;
+    mdlData.user = user.id;
     await this.sensorSoilTemperatureRepository.save(mdlData);
   }
 
-  async saveSoilMoisture(value: number): Promise<void> {
+  async saveSoilMoisture(token: string, value: number): Promise<void> {
+    const user = await this.tokenValidation(token);
+    if (!user) {
+      return;
+    }
+
     const mdlData = new SensorSoilMoisture();
     mdlData.moisture = value;
+    mdlData.user = user.id;
     await this.sensorSoilMoistureRepository.save(mdlData);
-  }
-
-  async saveWaterLevel(value: number): Promise<void> {
-    const mdlData = new SensorWaterLevel();
-    mdlData.level = value;
-    await this.sensorWaterLevelRepository.save(mdlData);
   }
 }
