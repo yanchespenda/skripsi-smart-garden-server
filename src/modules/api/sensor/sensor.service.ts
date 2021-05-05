@@ -214,17 +214,17 @@ export class SensorService {
       .createQueryBuilder('row')
       .select('row.humidity')
       .addSelect('row.createdAt')
-      .where('row.userId = :userId', {
-        userId: userId
-      })
-      .orderBy('row.createdAt', 'DESC');
+      .orderBy('row.createdAt', 'DESC')
+      .where('row.userId = :uid', {
+        uid: userId
+      });
 
     if (dateFormat === 1) {
-      query.limit(30)
+      query.limit(30);
     } else {
-      query.where('row.createdAt > :createdAt', {
+      query.andWhere('row.createdAt > :createdAt', {
         createdAt: DateTime.now().minus(this.convertSortToObject(dateFormat)).toSQLDate()
-      })
+      });
     }
 
     return await query.getMany();
@@ -235,17 +235,17 @@ export class SensorService {
       .createQueryBuilder('row')
       .select('row.temperature')
       .addSelect('row.createdAt')
-      .where('row.userId = :userId', {
-        userId: userId
-      })
-      .orderBy('row.createdAt', 'DESC');
+      .orderBy('row.createdAt', 'DESC')
+      .where('row.userId = :uid', {
+        uid: userId
+      });
 
     if (dateFormat === 1) {
-      query.limit(30)
+      query.limit(30);
     } else {
-      query.where('row.createdAt > :createdAt', {
+      query.andWhere('row.createdAt > :createdAt', {
         createdAt: DateTime.now().minus(this.convertSortToObject(dateFormat)).toSQLDate()
-      })
+      });
     }
 
     return await query.getMany();
@@ -256,17 +256,17 @@ export class SensorService {
       .createQueryBuilder('row')
       .select('row.moisture')
       .addSelect('row.createdAt')
-      .where('row.userId = :userId', {
-        userId: userId
-      })
-      .orderBy('row.createdAt', 'DESC');
+      .orderBy('row.createdAt', 'DESC')
+      .where('row.userId = :uid', {
+        uid: userId
+      });
 
     if (dateFormat === 1) {
-      query.limit(30)
+      query.limit(30);
     } else {
-      query.where('row.createdAt > :createdAt', {
+      query.andWhere('row.createdAt > :createdAt', {
         createdAt: DateTime.now().minus(this.convertSortToObject(dateFormat)).toSQLDate()
-      })
+      });
     }
 
     return await query.getMany();
@@ -277,17 +277,17 @@ export class SensorService {
       .createQueryBuilder('row')
       .select('row.temperature')
       .addSelect('row.createdAt')
-      .where('row.userId = :userId', {
-        userId: userId
-      })
-      .orderBy('row.createdAt', 'DESC');
+      .orderBy('row.createdAt', 'DESC')
+      .where('row.userId = :uid', {
+        uid: userId
+      });
 
     if (dateFormat === 1) {
-      query.limit(30)
+      query.limit(30);
     } else {
-      query.where('row.createdAt > :createdAt', {
+      query.andWhere('row.createdAt > :createdAt', {
         createdAt: DateTime.now().minus(this.convertSortToObject(dateFormat)).toSQLDate()
-      })
+      });
     }
 
     return await query.getMany();
