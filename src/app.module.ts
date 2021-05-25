@@ -21,6 +21,8 @@ import { SensorDHTTemperature } from '@entities/sensor-dht-temperature.entity';
 import { User } from '@entities/user.entity';
 import { SensorSoilMoisture } from '@entities/sensor-soil-moisture.entity';
 import { SensorSoilTemperature } from '@entities/sensor-soil-temperature.entity';
+import { PumpAction } from './core/entities/pump-action.entity';
+import { PumpAttemp } from './core/entities/pump-attemp.entity';
 
 
 
@@ -42,7 +44,10 @@ import { SensorSoilTemperature } from '@entities/sensor-soil-temperature.entity'
         SensorDHTHumidity,
         SensorDHTTemperature,
         SensorSoilMoisture,
-        SensorSoilTemperature
+        SensorSoilTemperature,
+
+        PumpAction,
+        PumpAttemp
       ],
       synchronize: true,
       charset: "utf8mb4_unicode_ci",

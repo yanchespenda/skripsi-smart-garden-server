@@ -5,13 +5,32 @@ export const toUserDto = (data: User): UserDto => {
   if (!data) {
     return undefined;
   }
-  const { id, username, password, mcuToken } = data;
+  const {
+    id,
+    username,
+    password,
+    mcuToken,
+    automationEnable,
+    automationParameter,
+    automationAttemp,
+    lastAction,
+    routineTaskEnable,
+    routineTaskSkipIfExceedParameter,
+    routineTaskTime
+  } = data;
 
   const userDto: UserDto = {
     id,
     username,
     password,
-    mcuToken
+    mcuToken,
+    automationEnable,
+    automationParameter,
+    automationAttemp,
+    lastAction,
+    routineTaskEnable,
+    routineTaskSkipIfExceedParameter,
+    routineTaskTime
   };
 
   return userDto;

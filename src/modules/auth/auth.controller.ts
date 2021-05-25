@@ -44,7 +44,8 @@ export class AuthController {
   @UseGuards(AuthGuard())
   public async me(@Req() req: any): Promise<any> {
     return {
-      // user: req.user,
+      user: req.user,
+      pumpAction: req.user.pumpAction,
       message: 'OK'
     };
   }

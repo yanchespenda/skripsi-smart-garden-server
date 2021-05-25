@@ -1,6 +1,8 @@
 import { Controller, Logger } from '@nestjs/common';
 import { Ctx, MessagePattern, MqttContext, Payload } from '@nestjs/microservices';
 import { MqttHandlerService } from './mqtt-handler.service';
+import { UserService } from '../user/user.service';
+
 import {
   MQTT_TOPIC_DHT_HUMIDITY,
   MQTT_TOPIC_DHT_TEMPERATURE,
@@ -22,8 +24,8 @@ export class MqttHandlerController {
    * @param mqttHandlerService MQTT handler services
    */
   constructor(
-
     private mqttHandlerService: MqttHandlerService,
+    private userService: UserService,
   ) { }
 
   /**
@@ -97,5 +99,22 @@ export class MqttHandlerController {
     if (this.payloadValidation(data)) {
       this.mqttHandlerService.saveSoilMoisture(data.token, data.value);
     }
+  }
+
+  /**
+   * 
+   * 
+   */
+  @MessagePattern('esp.action/+')
+  getEspAction(@Payload() data: any, @Ctx() context: MqttContext) {
+    this.logger.debug(data, context.getTopic());
+
+    if (data == 1) {
+      const mcuToken = context.getTopic().toString().replace('esp.action/', '');
+      this.userService.updateLastAction(mcuToken);
+    }
+
+    // console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
+    // return new Date().toLocaleTimeString(...);
   }
 }

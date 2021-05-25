@@ -1,9 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BeforeInsert, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BeforeInsert, OneToMany, OneToOne, JoinColumn, Index } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { SensorDHTHumidity } from './sensor-dht-humidity.entity';
 import { SensorDHTTemperature } from './sensor-dht-temperature.entity';
 import { SensorSoilMoisture } from './sensor-soil-moisture.entity';
 import { SensorSoilTemperature } from './sensor-soil-temperature.entity';
+import { PumpAttemp } from './pump-attemp.entity';
+// import { PumpAction } from './pump-action.entity';
+
 
 @Entity()
 export class User {
@@ -22,9 +25,54 @@ export class User {
 
   @Column({
     type: 'varchar', 
-    nullable: true,
+    nullable: true
   })
+  @Index()
   mcuToken: string;
+
+  // Pumping Action
+  @Column({
+    type: 'datetime',
+    nullable: true
+  })
+  lastAction: string;
+
+  @Column({
+    type: 'boolean',
+    default: false
+  })
+  automationEnable: boolean;
+
+  @Column({
+    type: 'text',
+    nullable: true
+  })
+  automationParameter: string;
+
+  @Column({
+    type: 'integer',
+    default: 3
+  })
+  automationAttemp: number;
+
+  @Column({
+    type: 'boolean',
+    default: false
+  })
+  routineTaskEnable: boolean;
+
+  @Column({
+    type: 'text',
+    nullable: true
+  })
+  routineTaskTime: string;
+
+  @Column({
+    type: 'boolean',
+    default: false
+  })
+  routineTaskSkipIfExceedParameter: boolean;
+  // End Pumping Action
 
   @CreateDateColumn()
   createdAt: Date;
@@ -43,6 +91,9 @@ export class User {
 
   @OneToMany(() => SensorSoilTemperature, sensor => sensor.user)
   sensorSoilTemperature: Promise<SensorSoilTemperature[]>;
+
+  @OneToMany(() => PumpAttemp, pumpAttemp => pumpAttemp.user)
+  pumpAttemp: Promise<PumpAttemp>;
 
   @BeforeInsert()
   async hashPassword() {

@@ -11,6 +11,8 @@ import { SensorDHTTemperature } from '@base/core/entities/sensor-dht-temperature
 import { SensorSoilMoisture } from '@base/core/entities/sensor-soil-moisture.entity';
 import { SensorSoilTemperature } from '@base/core/entities/sensor-soil-temperature.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserService } from '@base/modules/user/user.service';
+import { PumpAttemp } from '@base/core/entities/pump-attemp.entity';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       SensorDHTTemperature,
       SensorSoilMoisture,
       SensorSoilTemperature,
+
+      PumpAttemp,
     ]),
     MqttModule,
     UserModule,

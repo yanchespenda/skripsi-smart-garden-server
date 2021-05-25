@@ -1,14 +1,19 @@
 import { MQTT_SERVICE } from '@base/core/constants';
+import { UserService } from '@base/modules/user/user.service';
 import { Body, Controller, Get, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AuthGuard } from '@nestjs/passport';
+import { ActionService } from './action.service';
 import { PumpActionDto } from './interface/pump.action.interface';
+import { PumpSettingAutomation, PumpSettingAutomationDto } from './interface/pump.setting.interface';
 
 @Controller()
 export class ActionController {
 
   constructor(
     @Inject(MQTT_SERVICE) private mqttClient: ClientProxy,
+    private readonly actionService: ActionService,
+    private userService: UserService,
   ) {
     this.onApplicationBootstrap();
   }
@@ -17,16 +22,36 @@ export class ActionController {
     await this.mqttClient.connect();
   }
 
-  @Post('pump-action')
+  @Post('flush')
   @UseGuards(AuthGuard())
   public async sendPumpAction(@Req() req: any, @Body() body: PumpActionDto): Promise<any> {
-    const topic = 'esp.action.' + req.user.mcuToken;
+    const topic = 'esp.action/' + req.user.mcuToken;
     const payload = body?.value ? body.value : 0;
 
     await this.mqttClient.emit<string, number>(topic, payload).toPromise();
 
+    await this.userService.updateLastAction(req.user.mcuToken);
+
     return {
       message: 'OK'
     }
+  }
+
+  @Get('setting')
+  @UseGuards(AuthGuard())
+  public async setting(@Req() req: any): Promise<any> {
+    return await this.actionService.setting(req.user);
+  }
+
+  // @Get('setting-automation-parameter')
+  // @UseGuards(AuthGuard())
+  // public async settingAutomationParamter(): Promise<any> {
+  //   return await this.actionService.settingAutomationParamter();
+  // }
+
+  @Post('setting-automation')
+  @UseGuards(AuthGuard())
+  public async settingAutomation(@Req() req: any, @Body() body: PumpSettingAutomationDto): Promise<any> {
+    return await this.actionService.saveSettingAutomation(req.user, body);
   }
 }
