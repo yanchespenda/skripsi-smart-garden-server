@@ -6,12 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AuthModule } from '@modules/auth/auth.module';
-import { MqttHandlerModule } from '@modules/mqtt-handler/mqtt-handler.module';
 import { UserModule } from './modules/user/user.module';
 import { SensorModule } from './modules/api/sensor/sensor.module';
 import { ActionModule } from './modules/api/action/action.module';
-
-import { AppCronService } from './services/app-cron/app-cron.service';
 
 import { AppController } from './app.controller';
 
@@ -23,7 +20,9 @@ import { SensorSoilMoisture } from '@entities/sensor-soil-moisture.entity';
 import { SensorSoilTemperature } from '@entities/sensor-soil-temperature.entity';
 import { PumpAction } from './core/entities/pump-action.entity';
 import { PumpAttemp } from './core/entities/pump-attemp.entity';
-
+import { PumpRoutine } from './core/entities/pump-routine.entity';
+import { MqttModule } from './modules/mqtt/mqtt.module';
+import { MqttHandlerModule } from './modules/mqtt-handler/mqtt-handler.module';
 
 
 @Module({
@@ -47,7 +46,8 @@ import { PumpAttemp } from './core/entities/pump-attemp.entity';
         SensorSoilTemperature,
 
         PumpAction,
-        PumpAttemp
+        PumpAttemp,
+        PumpRoutine
       ],
       synchronize: true,
       charset: "utf8mb4_unicode_ci",
@@ -56,12 +56,12 @@ import { PumpAttemp } from './core/entities/pump-attemp.entity';
     UserModule,
     AuthModule,
     MqttHandlerModule,
+    MqttModule,
     SensorModule,
     ActionModule,
   ],
   controllers: [AppController],
   providers: [
-    AppCronService
   ],
 })
 export class AppModule {}

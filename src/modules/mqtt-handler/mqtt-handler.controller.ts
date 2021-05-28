@@ -4,10 +4,11 @@ import { MqttHandlerService } from './mqtt-handler.service';
 import { UserService } from '../user/user.service';
 
 import {
-  MQTT_TOPIC_DHT_HUMIDITY,
-  MQTT_TOPIC_DHT_TEMPERATURE,
-  MQTT_TOPIC_SOIL_MOISTURE,
-  MQTT_TOPIC_SOIL_TEMPERATURE
+  MQTT_TOPIC_DHT_HUMIDITY_HANDLER,
+  MQTT_TOPIC_DHT_TEMPERATURE_HANDLER,
+  MQTT_TOPIC_ESP_ACTION_HANDLER,
+  MQTT_TOPIC_SOIL_MOISTURE_HANDLER,
+  MQTT_TOPIC_SOIL_TEMPERATURE_HANDLER
 } from '@constants/index';
 
 @Controller('mqtt-handler')
@@ -29,31 +30,18 @@ export class MqttHandlerController {
   ) { }
 
   /**
-   * MQTT payload validation
-   * 
-   * @param payload Object
-   * @returns boolean
-   */
-  private payloadValidation(payload: any): boolean {
-    if (payload?.token && payload?.value) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
    * DHT-11 Sensor Humadity
    * 
    * @param data Object
    * @param context MqttContext
    */
-  @MessagePattern(MQTT_TOPIC_DHT_HUMIDITY)
-  getSensorDHTHumadity(@Payload() data: any, @Ctx() context: MqttContext) {
+  @MessagePattern(`${MQTT_TOPIC_DHT_HUMIDITY_HANDLER}+`)
+  getSensorDHTHumadity(@Payload() data: number, @Ctx() context: MqttContext) {
     this.logger.debug(data, context.getTopic());
 
-    if (this.payloadValidation(data)) {
-      this.mqttHandlerService.saveDHTHumidity(data.token, data.value);
-    }
+    const mcuToken = context.getTopic().toString().replace(MQTT_TOPIC_DHT_TEMPERATURE_HANDLER, '');
+
+    this.mqttHandlerService.saveDHTHumidity(mcuToken, data);
   }
 
   /**
@@ -62,13 +50,13 @@ export class MqttHandlerController {
    * @param data Object
    * @param context MqttContext
    */
-  @MessagePattern(MQTT_TOPIC_DHT_TEMPERATURE)
-  getSensorDHTTemperature(@Payload() data: any, @Ctx() context: MqttContext) {
+  @MessagePattern(`${MQTT_TOPIC_DHT_TEMPERATURE_HANDLER}+`)
+  getSensorDHTTemperature(@Payload() data: number, @Ctx() context: MqttContext) {
     this.logger.debug(data, context.getTopic());
 
-    if (this.payloadValidation(data)) {
-      this.mqttHandlerService.saveDHTTemperature(data.token, data.value);
-    }
+    const mcuToken = context.getTopic().toString().replace(MQTT_TOPIC_DHT_TEMPERATURE_HANDLER, '');
+
+    this.mqttHandlerService.saveDHTTemperature(mcuToken, data);
   }
 
   /**
@@ -77,13 +65,13 @@ export class MqttHandlerController {
    * @param data Object
    * @param context MqttContext
    */
-  @MessagePattern(MQTT_TOPIC_SOIL_TEMPERATURE)
-  getSensorSoilTemperature(@Payload() data: any, @Ctx() context: MqttContext) {
+  @MessagePattern(`${MQTT_TOPIC_SOIL_TEMPERATURE_HANDLER}+`)
+  getSensorSoilTemperature(@Payload() data: number, @Ctx() context: MqttContext) {
     this.logger.debug(data, context.getTopic());
 
-    if (this.payloadValidation(data)) {
-      this.mqttHandlerService.saveSoilTemperature(data.token, data.value);
-    }
+    const mcuToken = context.getTopic().toString().replace(MQTT_TOPIC_SOIL_TEMPERATURE_HANDLER, '');
+
+    this.mqttHandlerService.saveSoilTemperature(mcuToken, data);
   }
 
   /**
@@ -92,29 +80,28 @@ export class MqttHandlerController {
    * @param data Object
    * @param context MqttContext
    */
-  @MessagePattern(MQTT_TOPIC_SOIL_MOISTURE)
-  getSensorSoilMoisture(@Payload() data: any, @Ctx() context: MqttContext) {
+  @MessagePattern(`${MQTT_TOPIC_SOIL_MOISTURE_HANDLER}+`)
+  getSensorSoilMoisture(@Payload() data: number, @Ctx() context: MqttContext) {
     this.logger.debug(data, context.getTopic());
 
-    if (this.payloadValidation(data)) {
-      this.mqttHandlerService.saveSoilMoisture(data.token, data.value);
-    }
+    const mcuToken = context.getTopic().toString().replace(MQTT_TOPIC_SOIL_MOISTURE_HANDLER, '');
+
+    this.mqttHandlerService.saveSoilMoisture(mcuToken, data);
   }
 
   /**
+   * ESP Action Handler
    * 
-   * 
+   * @param data 
+   * @param context 
    */
-  @MessagePattern('esp.action/+')
-  getEspAction(@Payload() data: any, @Ctx() context: MqttContext) {
+  @MessagePattern(`${MQTT_TOPIC_ESP_ACTION_HANDLER}+`)
+  getEspAction(@Payload() data: number, @Ctx() context: MqttContext) {
     this.logger.debug(data, context.getTopic());
 
-    if (data == 1) {
-      const mcuToken = context.getTopic().toString().replace('esp.action/', '');
-      this.userService.updateLastAction(mcuToken);
+    const mcuToken = context.getTopic().toString().replace(MQTT_TOPIC_ESP_ACTION_HANDLER, '');
+    if (data >= 1 && data <= 3) {
+      this.userService.updatePumpAction(mcuToken, data);
     }
-
-    // console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
-    // return new Date().toLocaleTimeString(...);
   }
 }

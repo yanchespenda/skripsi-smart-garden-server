@@ -5,7 +5,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { AuthGuard } from '@nestjs/passport';
 import { ActionService } from './action.service';
 import { PumpActionDto } from './interface/pump.action.interface';
-import { PumpSettingAutomation, PumpSettingAutomationDto } from './interface/pump.setting.interface';
+import { PumpSettingAutomation, PumpSettingAutomationDto, PumpSettingRoutimeDto } from './interface/pump.setting.interface';
 
 @Controller()
 export class ActionController {
@@ -43,15 +43,27 @@ export class ActionController {
     return await this.actionService.setting(req.user);
   }
 
-  // @Get('setting-automation-parameter')
-  // @UseGuards(AuthGuard())
-  // public async settingAutomationParamter(): Promise<any> {
-  //   return await this.actionService.settingAutomationParamter();
-  // }
+  @Get('setting-automation')
+  @UseGuards(AuthGuard())
+  public async getSettingAutomation(@Req() req: any): Promise<any> {
+    return await this.actionService.getSettingAutomation(req.user);
+  }
+
+  @Get('setting-routine')
+  @UseGuards(AuthGuard())
+  public async getSettingRoutine(@Req() req: any): Promise<any> {
+    return await this.actionService.getSettingRoutine(req.user);
+  }
 
   @Post('setting-automation')
   @UseGuards(AuthGuard())
   public async settingAutomation(@Req() req: any, @Body() body: PumpSettingAutomationDto): Promise<any> {
     return await this.actionService.saveSettingAutomation(req.user, body);
+  }
+
+  @Post('setting-routine')
+  @UseGuards(AuthGuard())
+  public async settingRoutine(@Req() req: any, @Body() body: PumpSettingRoutimeDto): Promise<any> {
+    return await this.actionService.saveSettingRoutime(req.user, body);
   }
 }

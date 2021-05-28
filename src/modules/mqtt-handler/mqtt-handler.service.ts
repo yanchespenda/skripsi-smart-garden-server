@@ -30,9 +30,10 @@ export class MqttHandlerService {
       return;
     }
 
-    const mdlData = new SensorDHTHumidity();
-    mdlData.humidity = value;
-    mdlData.user = user.id;
+    const mdlData = this.sensorDHTHumidityRepository.create({
+      humidity: value,
+      user
+    });
     await this.sensorDHTHumidityRepository.save(mdlData);
   }
 
@@ -42,9 +43,10 @@ export class MqttHandlerService {
       return;
     }
 
-    const mdlData = new SensorDHTTemperature();
-    mdlData.temperature = value;
-    mdlData.user = user.id;
+    const mdlData = this.sensorDHTTemperatureRepository.create({
+      temperature: value,
+      user
+    });
     await this.sensorDHTTemperatureRepository.save(mdlData);
   }
 
@@ -54,10 +56,13 @@ export class MqttHandlerService {
       return;
     }
 
-    const mdlData = new SensorSoilTemperature();
-    mdlData.temperature = value;
-    mdlData.user = user.id;
+    const mdlData = this.sensorSoilTemperatureRepository.create({
+      temperature: value,
+      user
+    });
     await this.sensorSoilTemperatureRepository.save(mdlData);
+
+    await this.usersService.handlingUserParameter(user, 1, value);
   }
 
   async saveSoilMoisture(token: string, value: number): Promise<void> {
@@ -66,9 +71,12 @@ export class MqttHandlerService {
       return;
     }
 
-    const mdlData = new SensorSoilMoisture();
-    mdlData.moisture = value;
-    mdlData.user = user.id;
+    const mdlData = this.sensorSoilMoistureRepository.create({
+      moisture: value,
+      user
+    });
     await this.sensorSoilMoistureRepository.save(mdlData);
+
+    await this.usersService.handlingUserParameter(user, 2, value);
   }
 }

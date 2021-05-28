@@ -3,7 +3,7 @@ import { UserService } from '@base/modules/user/user.service';
 import { ACTION_CONFIG } from '@base/universal-config';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { Validator, Schema } from 'jsonschema';
-import { PumpSettingAutomation, PumpSettingAutomationParameter } from './interface/pump.setting.interface';
+import { PumpSettingAutomation, PumpSettingAutomationParameter, PumpSettingRoutimeDto } from './interface/pump.setting.interface';
 
 @Injectable()
 export class ActionService {
@@ -13,6 +13,14 @@ export class ActionService {
 
   async setting(userDto: UserDto): Promise<any> {
     return await this.userService.findUserAction(userDto);
+  }
+
+  async getSettingAutomation(userDto: UserDto): Promise<any> {
+    return await this.userService.findUserActionAutomation(userDto);
+  }
+
+  async getSettingRoutine(userDto: UserDto): Promise<any> {
+    return await this.userService.findUserActionRoutine(userDto);
   }
 
   async saveSettingAutomation(userDto: UserDto, body: PumpSettingAutomation): Promise<any> {
@@ -62,6 +70,21 @@ export class ActionService {
     }
 
     throw new UnprocessableEntityException('Parameter does not valid');
+  }
+
+  async saveSettingRoutime(userDto: UserDto, body: PumpSettingRoutimeDto): Promise<any> {
+    try {
+      const action = await this.userService.saveUserRoutine(userDto, body);
+      if (!action) {
+        throw new UnprocessableEntityException('Something went wrong X1');
+      }
+    } catch (error) {
+      throw new UnprocessableEntityException('Something went wrong X2');
+    }
+
+    return {
+      status: 'OK'
+    }
   }
 
   private uniqueParameterSensor(paramter: PumpSettingAutomationParameter[]): boolean {

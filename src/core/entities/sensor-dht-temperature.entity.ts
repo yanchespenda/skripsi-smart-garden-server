@@ -14,7 +14,7 @@ export class SensorDHTTemperature {
   temperature: number;
 
   @ManyToOne(() => User, user => user.id)
-  user: number;
+  user: User;
 
   @CreateDateColumn()
   createdAt: Date;

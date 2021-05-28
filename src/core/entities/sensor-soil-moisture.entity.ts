@@ -14,7 +14,7 @@ export class SensorSoilMoisture {
   moisture: number;
 
   @ManyToOne(() => User, user => user.id)
-  user: number;
+  user: User;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -2,16 +2,23 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 import { User } from './user.entity';
 
 @Entity()
-export class SensorSoilTemperature {
+export class PumpRoutine {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({
-    type: 'float',
-    width: 2,
-    precision: 2
+    type: 'varchar',
+    length: 255,
+    nullable: true
   })
-  temperature: number;
+  cronTime: string;
+
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true
+  })
+  realTime: string;
 
   @ManyToOne(() => User, user => user.id)
   user: User;
@@ -21,4 +28,5 @@ export class SensorSoilTemperature {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
 }

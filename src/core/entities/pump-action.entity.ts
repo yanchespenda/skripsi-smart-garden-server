@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
@@ -7,40 +7,21 @@ export class PumpAction {
   id: number;
 
   @Column({
-    type: 'date',
+    type: 'varchar',
+    length: 255,
     nullable: true
   })
-  lastAction: Date;
+  type: string;
 
   @Column({
-    type: 'boolean',
-    default: false
-  })
-  automationEnable: boolean;
-
-  @Column({
-    type: 'text',
+    type: 'varchar',
+    length: 255,
     nullable: true
   })
-  automationParameter: string;
+  action: string;
 
-  @Column({
-    type: 'boolean',
-    default: false
-  })
-  routineTaskEnable: boolean;
-
-  @Column({
-    type: 'text',
-    nullable: true
-  })
-  routineTaskTime: string;
-
-  @Column({
-    type: 'boolean',
-    default: false
-  })
-  routineTaskSkipIfExceedParameter: boolean;
+  @ManyToOne(() => User, user => user.id)
+  user: User;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -22,3 +22,21 @@ export class PumpSettingAutomationDto {
   @IsNotEmpty()
   automationParameter: string;
 }
+
+export interface PumpSettingRoutime {
+  routineEnable: boolean;
+  routineSkipParamater: boolean;
+  routineTime: string;
+}
+
+export class PumpSettingRoutimeDto {
+  @IsNotEmpty()
+  routineEnable: boolean;
+
+  @IsNotEmpty()
+  routineSkipParamater: boolean;
+
+  @IsNotEmpty()
+  routineTime: string;
+}
+

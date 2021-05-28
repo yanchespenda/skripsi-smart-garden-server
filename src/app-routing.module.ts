@@ -28,5 +28,6 @@ export const routes: Routes = [
 @Module({
   imports: [RouterModule.forRoutes(routes)],
   exports: [RouterModule],
+  providers: [],
 })
 export class AppRoutingModule {}

@@ -5,6 +5,7 @@ import { SensorDHTTemperature } from './sensor-dht-temperature.entity';
 import { SensorSoilMoisture } from './sensor-soil-moisture.entity';
 import { SensorSoilTemperature } from './sensor-soil-temperature.entity';
 import { PumpAttemp } from './pump-attemp.entity';
+import { PumpRoutine } from './pump-routine.entity';
 // import { PumpAction } from './pump-action.entity';
 
 
@@ -94,6 +95,9 @@ export class User {
 
   @OneToMany(() => PumpAttemp, pumpAttemp => pumpAttemp.user)
   pumpAttemp: Promise<PumpAttemp>;
+
+  @OneToMany(() => PumpRoutine, pumpAttemp => pumpAttemp.user)
+  pumpRoutine: Promise<PumpRoutine>;
 
   @BeforeInsert()
   async hashPassword() {
