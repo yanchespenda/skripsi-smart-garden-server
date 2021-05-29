@@ -17,7 +17,7 @@ import { DateTime } from 'luxon';
 import { PumpRoutine } from '@base/core/entities/pump-routine.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { MQTT_SERVICE } from '@base/core/constants';
-import { CronData, CronDataCallback } from '@base/modules/user/interface';
+import { ActionHistory, CronData } from '@base/modules/user/interface';
 import { SensorSoilMoisture } from '@base/core/entities/sensor-soil-moisture.entity';
 import { SensorSoilTemperature } from '@base/core/entities/sensor-soil-temperature.entity';
 import { SchedulerRegistry } from '@nestjs/schedule';
@@ -360,6 +360,48 @@ export class UserService implements OnApplicationBootstrap {
       });
       await this.pumpActionRepository.save(pumpAction);
     }
+  }
+
+  async historyPumpAction(userDto: UserDto, page: number = 1): Promise<ActionHistory> {
+    const take = 10;
+    const skip = (take * page) - take;
+
+    const historyAll = await this.pumpActionRepository.count({
+      where: {
+        user: userDto
+      }
+    });
+
+    let listHistory: ActionHistory = {
+      list: [],
+      total: historyAll
+    };
+
+    if (historyAll > 0) {
+      const histories = await this.pumpActionRepository.find({
+        where: {
+          user: userDto
+        },
+        order: {
+          id: 'DESC'
+        },
+        take,
+        skip
+      });
+      
+
+      if (histories) {
+        listHistory.list = histories.map(history => {
+          return {
+            createdAt: history.createdAt,
+            action: history.action,
+            from: history.fromAction
+          }
+        });
+      }
+    }
+
+    return listHistory;
   }
 
   private makeid(length = 25) {

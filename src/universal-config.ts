@@ -11,5 +11,6 @@ export const MQTT_CONFIG = {
 
 export const ACTION_CONFIG = {
     SETTING_AUTOMATION_SENSOR_VALIDATION: ['soil.temperature', 'soil.moisture'],
-    NAME: ['STOP', 'START', 'FORCE STOP']
+    NAME: ['STOP', 'START', 'FORCE STOP'],
+    FROM: ['DASHBOARD', 'AUTOMATION', 'ROUTINE']
 };

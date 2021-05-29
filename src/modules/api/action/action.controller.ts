@@ -1,6 +1,7 @@
 import { MQTT_SERVICE } from '@base/core/constants';
+import { ActionHistory } from '@base/modules/user/interface';
 import { UserService } from '@base/modules/user/user.service';
-import { Body, Controller, Get, Inject, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AuthGuard } from '@nestjs/passport';
 import { ActionService } from './action.service';
@@ -41,6 +42,12 @@ export class ActionController {
   @UseGuards(AuthGuard())
   public async setting(@Req() req: any): Promise<any> {
     return await this.actionService.setting(req.user);
+  }
+
+  @Get('history')
+  @UseGuards(AuthGuard())
+  public async history(@Req() req: any, @Query('page') page?: number): Promise<ActionHistory> {
+    return await this.actionService.history(req.user, page);
   }
 
   @Get('setting-automation')

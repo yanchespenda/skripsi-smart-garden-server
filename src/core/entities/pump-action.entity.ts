@@ -20,6 +20,13 @@ export class PumpAction {
   })
   action: string;
 
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true
+  })
+  fromAction: string;
+
   @ManyToOne(() => User, user => user.id)
   user: User;
 

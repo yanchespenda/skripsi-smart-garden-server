@@ -1,4 +1,5 @@
 import { UserDto } from '@base/modules/user/dto/user.dto';
+import { ActionHistory } from '@base/modules/user/interface';
 import { UserService } from '@base/modules/user/user.service';
 import { ACTION_CONFIG } from '@base/universal-config';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
@@ -13,6 +14,10 @@ export class ActionService {
 
   async setting(userDto: UserDto): Promise<any> {
     return await this.userService.findUserAction(userDto);
+  }
+
+  async history(userDto: UserDto, page: number): Promise<ActionHistory> {
+    return await this.userService.historyPumpAction(userDto, page);
   }
 
   async getSettingAutomation(userDto: UserDto): Promise<any> {
