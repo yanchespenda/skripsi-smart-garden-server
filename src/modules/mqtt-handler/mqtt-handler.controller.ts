@@ -100,7 +100,7 @@ export class MqttHandlerController {
     this.logger.debug(data, context.getTopic());
 
     const mcuToken = context.getTopic().toString().replace(MQTT_TOPIC_ESP_ACTION_HANDLER, '');
-    if (data >= 1 && data <= 3) {
+    if (data >= 0 && data <= 2) {
       this.userService.updatePumpAction(mcuToken, data);
     }
   }

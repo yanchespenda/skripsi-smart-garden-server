@@ -352,7 +352,7 @@ export class UserService implements OnApplicationBootstrap {
       const actionList = ACTION_CONFIG.NAME;
       const pumpAction = this.pumpActionRepository.create({
         type: actionType.toString(),
-        action: actionList[actionType - 1],
+        action: actionList[actionType],
         user: userDto
       });
       await this.pumpActionRepository.save(pumpAction);
