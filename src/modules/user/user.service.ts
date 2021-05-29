@@ -145,49 +145,52 @@ export class UserService implements OnApplicationBootstrap {
   }
 
   async handlingUserParameter(userDto: UserDto, attempType: number, sensorValue: number): Promise<void> {
-    const sensorList = ACTION_CONFIG.SETTING_AUTOMATION_SENSOR_VALIDATION;
-    let dataTemporarySensor: number[] = [-1, -1];
+    if (userDto.automationEnable) {
 
-    const userParameterResult = await this.findUserActionParam(userDto);
-    userParameterResult.forEach(param => {
-      if (param.enable) {
-        if (param.sensor === sensorList[0]) {
-          dataTemporarySensor[0] = param.value;
-        } else if (param.sensor === sensorList[1]) {
-          dataTemporarySensor[1] = param.value;
+      const sensorList = ACTION_CONFIG.SETTING_AUTOMATION_SENSOR_VALIDATION;
+      let dataTemporarySensor: number[] = [-1, -1];
+
+      const userParameterResult = await this.findUserActionParam(userDto);
+      userParameterResult.forEach(param => {
+        if (param.enable) {
+          if (param.sensor === sensorList[0]) {
+            dataTemporarySensor[0] = param.value;
+          } else if (param.sensor === sensorList[1]) {
+            dataTemporarySensor[1] = param.value;
+          }
+        }
+      });
+  
+      let isIncreased = false;
+  
+      if (attempType === 1 && dataTemporarySensor[0] > -1) {
+        if (dataTemporarySensor[0] > sensorValue) {
+          isIncreased = true;
         }
       }
-    });
-
-    let isIncreased = false;
-
-    if (attempType === 1 && dataTemporarySensor[0] > -1) {
-      if (dataTemporarySensor[0] > sensorValue) {
-        isIncreased = true;
+  
+  
+      if (attempType === 2 && dataTemporarySensor[1] > -1) {
+        if (dataTemporarySensor[1] > sensorValue) {
+          isIncreased = true;
+        }
       }
-    }
-
-
-    if (attempType === 2 && dataTemporarySensor[1] > -1) {
-      if (dataTemporarySensor[1] > sensorValue) {
-        isIncreased = true;
+  
+      if (isIncreased) {
+        const getAttempCount = await this.findUserPumpAttemp(userDto);
+        if (getAttempCount < userDto.automationAttemp) {
+          await this.increaseUserPumpAttemp(userDto);
+        }
       }
-    }
-
-    if (isIncreased) {
+  
       const getAttempCount = await this.findUserPumpAttemp(userDto);
-      if (getAttempCount < userDto.automationAttemp) {
-        await this.increaseUserPumpAttemp(userDto);
+      if (getAttempCount >= userDto.automationAttemp) {
+        await this.deleteUserPumpAttemp(userDto);
+        await this.mqttClient.connect();
+        const topic = 'esp.action/' + userDto.mcuToken;
+        const payload = 1;
+        await this.mqttClient.emit<string, number>(topic, payload).toPromise();
       }
-    }
-
-    const getAttempCount = await this.findUserPumpAttemp(userDto);
-    if (getAttempCount >= userDto.automationAttemp) {
-      await this.deleteUserPumpAttemp(userDto);
-      await this.mqttClient.connect();
-      const topic = 'esp.action/' + userDto.mcuToken;
-      const payload = 1;
-      await this.mqttClient.emit<string, number>(topic, payload).toPromise();
     }
   }
 
