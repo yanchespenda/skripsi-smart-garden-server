@@ -96,12 +96,12 @@ export class MqttHandlerController {
    * @param context 
    */
   @MessagePattern(`${MQTT_TOPIC_ESP_ACTION_HANDLER}+`)
-  getEspAction(@Payload() data: number, @Ctx() context: MqttContext) {
+  getEspAction(@Payload() data: number[], @Ctx() context: MqttContext) {
     this.logger.debug(data, context.getTopic());
 
     const mcuToken = context.getTopic().toString().replace(MQTT_TOPIC_ESP_ACTION_HANDLER, '');
-    if (data >= 0 && data <= 2) {
-      this.userService.updatePumpAction(mcuToken, data);
+    if (data.length === 2 && (data[0] >= 0 && data[0] <= 2) && (data[1] >=0 && data[1] <= 2)) {
+      this.userService.updatePumpAction(mcuToken, data[0], data[1]);
     }
   }
 }

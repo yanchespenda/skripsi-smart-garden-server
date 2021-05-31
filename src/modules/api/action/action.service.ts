@@ -47,9 +47,17 @@ export class ActionService {
             },
             value: {
               type: 'number'
+            },
+            operator: {
+              type: 'string',
+              enum: [
+                '<=',
+                '>='
+              ]
             }
           },
-          required: ['enable', 'sensor', 'value']
+          additionalProperties: false,
+          required: ['enable', 'sensor', 'value', 'operator']
         },
         title: 'Sensor Parameter'
       };

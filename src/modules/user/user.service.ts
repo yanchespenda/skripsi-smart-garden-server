@@ -149,14 +149,21 @@ export class UserService implements OnApplicationBootstrap {
 
       const sensorList = ACTION_CONFIG.SETTING_AUTOMATION_SENSOR_VALIDATION;
       let dataTemporarySensor: number[] = [-1, -1];
+      let dataOperatorSensor: boolean[] = [false, false];
 
       const userParameterResult = await this.findUserActionParam(userDto);
       userParameterResult.forEach(param => {
         if (param.enable) {
           if (param.sensor === sensorList[0]) {
             dataTemporarySensor[0] = param.value;
+            if (param.operator === '>=') {
+              dataOperatorSensor[0] = true;
+            }
           } else if (param.sensor === sensorList[1]) {
             dataTemporarySensor[1] = param.value;
+            if (param.operator === '>=') {
+              dataOperatorSensor[1] = true;
+            }
           }
         }
       });
@@ -164,14 +171,20 @@ export class UserService implements OnApplicationBootstrap {
       let isIncreased = false;
   
       if (attempType === 1 && dataTemporarySensor[0] > -1) {
-        if (dataTemporarySensor[0] > sensorValue) {
+        if (
+          (dataOperatorSensor[0] && dataTemporarySensor[0] >= sensorValue) ||
+          (!dataOperatorSensor[1] && dataTemporarySensor[0] <= sensorValue)
+        ) {
           isIncreased = true;
         }
       }
   
   
       if (attempType === 2 && dataTemporarySensor[1] > -1) {
-        if (dataTemporarySensor[1] > sensorValue) {
+        if (
+          (dataOperatorSensor[0] && dataTemporarySensor[1] >= sensorValue) ||
+          (!dataOperatorSensor[1] && dataTemporarySensor[1] <= sensorValue)
+        ) {
           isIncreased = true;
         }
       }
@@ -188,8 +201,8 @@ export class UserService implements OnApplicationBootstrap {
         await this.deleteUserPumpAttemp(userDto);
         await this.mqttClient.connect();
         const topic = 'esp.action/' + userDto.mcuToken;
-        const payload = 1;
-        await this.mqttClient.emit<string, number>(topic, payload).toPromise();
+        const payload = [1, 1];
+          await this.mqttClient.emit<string, number[]>(topic, payload).toPromise();
       }
     }
   }
@@ -344,7 +357,7 @@ export class UserService implements OnApplicationBootstrap {
     }
   }
 
-  async updatePumpAction(mcuToken: string, actionType: number): Promise<void> {
+  async updatePumpAction(mcuToken: string, actionType: number, from?: number): Promise<void> {
     const userDto: UserDto = await this.findOne({ where:  { mcuToken } });
     if (userDto) {
       if (actionType === 1) {
@@ -353,10 +366,12 @@ export class UserService implements OnApplicationBootstrap {
       }
 
       const actionList = ACTION_CONFIG.NAME;
+      const fromList = ACTION_CONFIG.FROM;
       const pumpAction = this.pumpActionRepository.create({
         type: actionType.toString(),
-        action: actionList[actionType],
-        user: userDto
+        action: actionList[actionType] || '-',
+        user: userDto,
+        fromAction: fromList[from] || '-'
       });
       await this.pumpActionRepository.save(pumpAction);
     }
@@ -460,7 +475,7 @@ export class UserService implements OnApplicationBootstrap {
 
   async addRoutineCronJob(userDto: UserDto, name: string, {seconds, hours, minutes}: CronData) {
     const job = new CronJob(`${seconds} ${minutes} ${hours} * * *`, async () => {
-      this.logger.warn(`time (${seconds}) seconds, (${minutes}) minutes, (${hours}) hours, for job ${name} to run!`);
+      this.logger.warn(`Routine time (${seconds}) seconds, (${minutes}) minutes, (${hours}) hours, for job ${name} to run!`);
 
       if (userDto.routineTaskEnable) {
         let runRoutine = true;
@@ -468,14 +483,21 @@ export class UserService implements OnApplicationBootstrap {
           const sensorList = ACTION_CONFIG.SETTING_AUTOMATION_SENSOR_VALIDATION;
   
           let dataTemporarySensor: number[] = [-1, -1];
+          let dataOperatorSensor: boolean[] = [false, false];
   
           const userParameterResult = await this.findUserActionParam(userDto);
           userParameterResult.forEach(param => {
             if (param.enable) {
               if (param.sensor === sensorList[0]) {
                 dataTemporarySensor[0] = param.value;
+                if (param.operator === '>=') {
+                  dataOperatorSensor[0] = true;
+                }
               } else if (param.sensor === sensorList[1]) {
                 dataTemporarySensor[1] = param.value;
+                if (param.operator === '>=') {
+                  dataOperatorSensor[1] = true;
+                }
               }
             }
           });
@@ -491,7 +513,10 @@ export class UserService implements OnApplicationBootstrap {
             });
   
             if (getLastSoilTemperature) {
-              if (dataTemporarySensor[0] > getLastSoilTemperature.temperature) {
+              if (
+                (dataOperatorSensor[0] && dataTemporarySensor[1] >= getLastSoilTemperature.temperature) ||
+                (!dataOperatorSensor[1] && dataTemporarySensor[1] <= getLastSoilTemperature.temperature)
+              ) {
                 runRoutine = false;
               }
             }
@@ -509,7 +534,10 @@ export class UserService implements OnApplicationBootstrap {
             });
   
             if (getLastSoilMoisture) {
-              if (dataTemporarySensor[1] > getLastSoilMoisture.moisture) {
+              if (
+                (dataOperatorSensor[0] && dataTemporarySensor[1] >= getLastSoilMoisture.moisture) ||
+                (!dataOperatorSensor[1] && dataTemporarySensor[1] <= getLastSoilMoisture.moisture)
+              ) {
                 runRoutine = false;
               }
             }
@@ -521,9 +549,9 @@ export class UserService implements OnApplicationBootstrap {
           await this.mqttClient.connect();
 
           const topic = 'esp.action/' + userDto.mcuToken;
-          const payload = 1;
+          const payload = [1, 2];
 
-          await this.mqttClient.emit<string, number>(topic, payload).toPromise();
+          await this.mqttClient.emit<string, number[]>(topic, payload).toPromise();
         }
       }
 
@@ -533,7 +561,7 @@ export class UserService implements OnApplicationBootstrap {
     job.start();
   
     this.logger.warn(
-      `job ${name} added for each minute at (${seconds}) seconds, (${minutes}) minutes, (${hours}) hours!`,
+      `Job ${name} added for each minute at (${seconds}) seconds, (${minutes}) minutes, (${hours}) hours!`,
     );
   }
 

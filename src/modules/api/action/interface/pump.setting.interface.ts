@@ -4,6 +4,7 @@ export interface PumpSettingAutomationParameter {
   enable: boolean;
   sensor: string;
   value: number;
+  operator: string;
 }
 
 export interface PumpSettingAutomation {

@@ -27,9 +27,9 @@ export class ActionController {
   @UseGuards(AuthGuard())
   public async sendPumpAction(@Req() req: any, @Body() body: PumpActionDto): Promise<any> {
     const topic = 'esp.action/' + req.user.mcuToken;
-    const payload = body?.value ? body.value : 0;
+    const payload = body?.value ? [body.value, 0] : [0, 0];
 
-    await this.mqttClient.emit<string, number>(topic, payload).toPromise();
+    await this.mqttClient.emit<string, number[]>(topic, payload).toPromise();
 
     await this.userService.updateLastAction(req.user.mcuToken);
 
