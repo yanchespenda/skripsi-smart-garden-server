@@ -145,9 +145,7 @@ export class UserService implements OnApplicationBootstrap {
   }
 
   async handlingUserParameter(userDto: UserDto, attempType: number, sensorValue: number): Promise<void> {
-    this.logger.log(`Handling User Parameter for ${userDto.id} Incoming with ${userDto.automationEnable ? 'enable' : 'disable'}`);
     if (userDto.automationEnable) {
-      this.logger.log(`Handling User Parameter for ${userDto.id}`, JSON.stringify(userDto));
 
       const sensorList = ACTION_CONFIG.SETTING_AUTOMATION_SENSOR_VALIDATION;
       let dataTemporarySensor: number[] = [-1, -1];
@@ -175,8 +173,9 @@ export class UserService implements OnApplicationBootstrap {
       if (attempType === 1 && dataTemporarySensor[0] > -1) {
         if (
           (dataOperatorSensor[0] && dataTemporarySensor[0] >= sensorValue) ||
-          (!dataOperatorSensor[1] && dataTemporarySensor[0] <= sensorValue)
+          (!dataOperatorSensor[0] && dataTemporarySensor[0] <= sensorValue)
         ) {
+          this.logger.log(`Handling User Parameter for ${userDto.id} Increased by 1 with config [${dataTemporarySensor[0]} ${dataOperatorSensor[0] ? '<=' : '>='} ${sensorValue}]`);
           isIncreased = true;
         }
       }
@@ -184,9 +183,10 @@ export class UserService implements OnApplicationBootstrap {
   
       if (attempType === 2 && dataTemporarySensor[1] > -1) {
         if (
-          (dataOperatorSensor[0] && dataTemporarySensor[1] >= sensorValue) ||
+          (dataOperatorSensor[1] && dataTemporarySensor[1] >= sensorValue) ||
           (!dataOperatorSensor[1] && dataTemporarySensor[1] <= sensorValue)
         ) {
+          this.logger.log(`Handling User Parameter for ${userDto.id} Increased by 2 with config [${dataTemporarySensor[1]} ${dataOperatorSensor[1] ? '<=' : '>='} ${sensorValue}]`);
           isIncreased = true;
         }
       }
