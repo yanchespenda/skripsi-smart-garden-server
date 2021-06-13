@@ -146,15 +146,11 @@ export class UserService implements OnApplicationBootstrap {
 
   async handlingUserParameter(userDto: UserDto, attempType: number, sensorValue: number): Promise<void> {
     if (userDto.automationEnable) {
-
-      this.logger.log(JSON.stringify(userDto.automationParameter), `Handling User Parameter for ${userDto.id} DebugX`);
-
       const sensorList = ACTION_CONFIG.SETTING_AUTOMATION_SENSOR_VALIDATION;
       let dataTemporarySensor: number[] = [-1, -1];
       let dataOperatorSensor: boolean[] = [false, false];
 
       const userParameterResult = await this.findUserActionParam(userDto);
-      this.logger.log(JSON.stringify(userParameterResult), `Handling User Parameter for ${userDto.id} DebugA`);
       userParameterResult.forEach(param => {
         if (param.enable) {
           if (param.sensor === sensorList[0]) {
@@ -172,17 +168,11 @@ export class UserService implements OnApplicationBootstrap {
       });
   
       let isIncreased = false;
-
-      this.logger.log(JSON.stringify({
-        Operator: dataOperatorSensor,
-        TemporarySensor: dataTemporarySensor,
-        IncomingValue: sensorValue
-      }), `Handling User Parameter for ${userDto.id} DebugB`);
   
       if (attempType === 1 && dataTemporarySensor[0] > -1) {
         if (
-          (dataOperatorSensor[0] && dataTemporarySensor[0] >= sensorValue) ||
-          (!dataOperatorSensor[0] && dataTemporarySensor[0] <= sensorValue)
+          (dataOperatorSensor[0] && sensorValue >= dataTemporarySensor[0]) ||
+          (!dataOperatorSensor[0] && sensorValue <= dataTemporarySensor[0])
         ) {
           this.logger.log(`Handling User Parameter for ${userDto.id} Increased by 1 with config [${dataTemporarySensor[0]} ${dataOperatorSensor[0] ? '<=' : '>='} ${sensorValue}]`);
           isIncreased = true;
@@ -192,8 +182,8 @@ export class UserService implements OnApplicationBootstrap {
   
       if (attempType === 2 && dataTemporarySensor[1] > -1) {
         if (
-          (dataOperatorSensor[1] && dataTemporarySensor[1] >= sensorValue) ||
-          (!dataOperatorSensor[1] && dataTemporarySensor[1] <= sensorValue)
+          (dataOperatorSensor[1] && sensorValue >= dataTemporarySensor[1]) ||
+          (!dataOperatorSensor[1] && sensorValue <= dataTemporarySensor[1])
         ) {
           this.logger.log(`Handling User Parameter for ${userDto.id} Increased by 2 with config [${dataTemporarySensor[1]} ${dataOperatorSensor[1] ? '<=' : '>='} ${sensorValue}]`);
           isIncreased = true;
@@ -535,8 +525,8 @@ export class UserService implements OnApplicationBootstrap {
   
             if (getLastSoilTemperature) {
               if (
-                (dataOperatorSensor[0] && dataTemporarySensor[0] >= getLastSoilTemperature.temperature) ||
-                (!dataOperatorSensor[0] && dataTemporarySensor[0] <= getLastSoilTemperature.temperature)
+                (dataOperatorSensor[0] && getLastSoilTemperature.temperature >= dataTemporarySensor[0]) ||
+                (!dataOperatorSensor[0] &&  getLastSoilTemperature.temperature <= dataTemporarySensor[0])
               ) {
                 runRoutine = false;
               }
@@ -556,8 +546,8 @@ export class UserService implements OnApplicationBootstrap {
   
             if (getLastSoilMoisture) {
               if (
-                (dataOperatorSensor[1] && dataTemporarySensor[1] >= getLastSoilMoisture.moisture) ||
-                (!dataOperatorSensor[1] && dataTemporarySensor[1] <= getLastSoilMoisture.moisture)
+                (dataOperatorSensor[1] && getLastSoilMoisture.moisture >= dataTemporarySensor[1]) ||
+                (!dataOperatorSensor[1] && getLastSoilMoisture.moisture <= dataTemporarySensor[1])
               ) {
                 runRoutine = false;
               }
@@ -573,6 +563,8 @@ export class UserService implements OnApplicationBootstrap {
           const payload = [1, 2];
 
           await this.mqttClient.emit<string, number[]>(topic, payload).toPromise();
+
+          this.logger.log(`Routine Cron Job for ${userDto.id} run action`);
         }
       }
 
