@@ -147,14 +147,14 @@ export class UserService implements OnApplicationBootstrap {
   async handlingUserParameter(userDto: UserDto, attempType: number, sensorValue: number): Promise<void> {
     if (userDto.automationEnable) {
 
-      this.logger.log(`Handling User Parameter for ${userDto.id} DebugX`, JSON.stringify(userDto.automationParameter));
+      this.logger.log(JSON.stringify(userDto.automationParameter), `Handling User Parameter for ${userDto.id} DebugX`);
 
       const sensorList = ACTION_CONFIG.SETTING_AUTOMATION_SENSOR_VALIDATION;
       let dataTemporarySensor: number[] = [-1, -1];
       let dataOperatorSensor: boolean[] = [false, false];
 
       const userParameterResult = await this.findUserActionParam(userDto);
-      this.logger.log(`Handling User Parameter for ${userDto.id} DebugA`, JSON.stringify(userParameterResult));
+      this.logger.log(JSON.stringify(userParameterResult), `Handling User Parameter for ${userDto.id} DebugA`);
       userParameterResult.forEach(param => {
         if (param.enable) {
           if (param.sensor === sensorList[0]) {
@@ -173,11 +173,11 @@ export class UserService implements OnApplicationBootstrap {
   
       let isIncreased = false;
 
-      this.logger.log(`Handling User Parameter for ${userDto.id} DebugB`, JSON.stringify({
+      this.logger.log(JSON.stringify({
         Operator: dataOperatorSensor,
         TemporarySensor: dataTemporarySensor,
         IncomingValue: sensorValue
-      }));
+      }), `Handling User Parameter for ${userDto.id} DebugB`);
   
       if (attempType === 1 && dataTemporarySensor[0] > -1) {
         if (
