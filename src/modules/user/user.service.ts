@@ -526,8 +526,8 @@ export class UserService implements OnApplicationBootstrap {
   
             if (getLastSoilTemperature) {
               if (
-                (dataOperatorSensor[0] && dataTemporarySensor[1] >= getLastSoilTemperature.temperature) ||
-                (!dataOperatorSensor[1] && dataTemporarySensor[1] <= getLastSoilTemperature.temperature)
+                (dataOperatorSensor[0] && dataTemporarySensor[0] >= getLastSoilTemperature.temperature) ||
+                (!dataOperatorSensor[0] && dataTemporarySensor[0] <= getLastSoilTemperature.temperature)
               ) {
                 runRoutine = false;
               }
@@ -547,7 +547,7 @@ export class UserService implements OnApplicationBootstrap {
   
             if (getLastSoilMoisture) {
               if (
-                (dataOperatorSensor[0] && dataTemporarySensor[1] >= getLastSoilMoisture.moisture) ||
+                (dataOperatorSensor[1] && dataTemporarySensor[1] >= getLastSoilMoisture.moisture) ||
                 (!dataOperatorSensor[1] && dataTemporarySensor[1] <= getLastSoilMoisture.moisture)
               ) {
                 runRoutine = false;
