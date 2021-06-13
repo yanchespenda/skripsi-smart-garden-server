@@ -147,11 +147,14 @@ export class UserService implements OnApplicationBootstrap {
   async handlingUserParameter(userDto: UserDto, attempType: number, sensorValue: number): Promise<void> {
     if (userDto.automationEnable) {
 
+      this.logger.log(`Handling User Parameter for ${userDto.id} DebugX`, JSON.stringify(userDto.automationParameter));
+
       const sensorList = ACTION_CONFIG.SETTING_AUTOMATION_SENSOR_VALIDATION;
       let dataTemporarySensor: number[] = [-1, -1];
       let dataOperatorSensor: boolean[] = [false, false];
 
       const userParameterResult = await this.findUserActionParam(userDto);
+      this.logger.log(`Handling User Parameter for ${userDto.id} DebugA`, JSON.stringify(userParameterResult));
       userParameterResult.forEach(param => {
         if (param.enable) {
           if (param.sensor === sensorList[0]) {
@@ -170,7 +173,7 @@ export class UserService implements OnApplicationBootstrap {
   
       let isIncreased = false;
 
-      this.logger.log(`Handling User Parameter for ${userDto.id} Ddebug`, JSON.stringify({
+      this.logger.log(`Handling User Parameter for ${userDto.id} DebugB`, JSON.stringify({
         Operator: dataOperatorSensor,
         TemporarySensor: dataTemporarySensor,
         IncomingValue: sensorValue
