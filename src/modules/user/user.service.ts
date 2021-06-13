@@ -169,6 +169,12 @@ export class UserService implements OnApplicationBootstrap {
       });
   
       let isIncreased = false;
+
+      this.logger.log(`Handling User Parameter for ${userDto.id} Ddebug`, JSON.stringify({
+        Operator: dataOperatorSensor,
+        TemporarySensor: dataTemporarySensor,
+        IncomingValue: sensorValue
+      }));
   
       if (attempType === 1 && dataTemporarySensor[0] > -1) {
         if (
