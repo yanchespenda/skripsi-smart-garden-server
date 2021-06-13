@@ -145,7 +145,9 @@ export class UserService implements OnApplicationBootstrap {
   }
 
   async handlingUserParameter(userDto: UserDto, attempType: number, sensorValue: number): Promise<void> {
+    this.logger.log(`Handling User Parameter for ${userDto.id} Incoming with ${userDto.automationEnable ? 'enable' : 'disable'}`);
     if (userDto.automationEnable) {
+      this.logger.log(`Handling User Parameter for ${userDto.id}`, JSON.stringify(userDto));
 
       const sensorList = ACTION_CONFIG.SETTING_AUTOMATION_SENSOR_VALIDATION;
       let dataTemporarySensor: number[] = [-1, -1];
