@@ -194,6 +194,7 @@ export class UserService implements OnApplicationBootstrap {
         if (getAttempCount < userDto.automationAttemp) {
           await this.increaseUserPumpAttemp(userDto);
         }
+        this.logger.log(`Handling User Parameter for ${userDto.id} Increased [${getAttempCount + 1}/${userDto.automationAttemp}]`);
       }
   
       const getAttempCount = await this.findUserPumpAttemp(userDto);
@@ -202,7 +203,9 @@ export class UserService implements OnApplicationBootstrap {
         await this.mqttClient.connect();
         const topic = 'esp.action/' + userDto.mcuToken;
         const payload = [1, 1];
-          await this.mqttClient.emit<string, number[]>(topic, payload).toPromise();
+        await this.mqttClient.emit<string, number[]>(topic, payload).toPromise();
+
+        this.logger.log(`Handling User Parameter for ${userDto.id} run action`);
       }
     }
   }
@@ -354,6 +357,8 @@ export class UserService implements OnApplicationBootstrap {
     if (userDto) {
       userDto.lastAction = DateTime.now().toISO();
       await this.userRepository.save(userDto);
+
+      this.logger.log(`Update Last Action for ${userDto.id}`);
     }
   }
 
@@ -367,13 +372,18 @@ export class UserService implements OnApplicationBootstrap {
 
       const actionList = ACTION_CONFIG.NAME;
       const fromList = ACTION_CONFIG.FROM;
+
+      const actionName = actionList[actionType] || '-';
+      const fromActionName = fromList[from] || '-';
       const pumpAction = this.pumpActionRepository.create({
         type: actionType.toString(),
-        action: actionList[actionType] || '-',
+        action: actionName,
         user: userDto,
-        fromAction: fromList[from] || '-'
+        fromAction: fromActionName
       });
       await this.pumpActionRepository.save(pumpAction);
+
+      this.logger.log(`Update Pump Action for ${userDto.id} with action ${actionName} and from ${fromActionName}`);
     }
   }
 
@@ -561,7 +571,7 @@ export class UserService implements OnApplicationBootstrap {
     job.start();
   
     this.logger.warn(
-      `Job ${name} added for each minute at (${seconds}) seconds, (${minutes}) minutes, (${hours}) hours!`,
+      `Job ${name} added for at (${seconds}) seconds, (${minutes}) minutes, (${hours}) hours!`,
     );
   }
 
