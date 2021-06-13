@@ -174,7 +174,7 @@ export class UserService implements OnApplicationBootstrap {
           (dataOperatorSensor[0] && sensorValue >= dataTemporarySensor[0]) ||
           (!dataOperatorSensor[0] && sensorValue <= dataTemporarySensor[0])
         ) {
-          this.logger.log(`Handling User Parameter for ${userDto.id} Increased by 1 with config [${dataTemporarySensor[0]} ${dataOperatorSensor[0] ? '<=' : '>='} ${sensorValue}]`);
+          this.logger.log(`Handling User Parameter for ${userDto.id} Increased by 1 with config [${sensorValue} ${dataOperatorSensor[0] ? '>=' : '<='} ${dataTemporarySensor[0]}]`);
           isIncreased = true;
         }
       }
@@ -185,7 +185,7 @@ export class UserService implements OnApplicationBootstrap {
           (dataOperatorSensor[1] && sensorValue >= dataTemporarySensor[1]) ||
           (!dataOperatorSensor[1] && sensorValue <= dataTemporarySensor[1])
         ) {
-          this.logger.log(`Handling User Parameter for ${userDto.id} Increased by 2 with config [${dataTemporarySensor[1]} ${dataOperatorSensor[1] ? '<=' : '>='} ${sensorValue}]`);
+          this.logger.log(`Handling User Parameter for ${userDto.id} Increased by 2 with config [${sensorValue} ${dataOperatorSensor[1] ? '>=' : '<='} ${dataTemporarySensor[1]}]`);
           isIncreased = true;
         }
       }
@@ -528,6 +528,7 @@ export class UserService implements OnApplicationBootstrap {
                 (dataOperatorSensor[0] && getLastSoilTemperature.temperature >= dataTemporarySensor[0]) ||
                 (!dataOperatorSensor[0] &&  getLastSoilTemperature.temperature <= dataTemporarySensor[0])
               ) {
+                this.logger.log(`Routine Cron Job for ${userDto.id} parameter 1 config [${getLastSoilTemperature.temperature} ${dataOperatorSensor[0] ? '>=' : '<='} ${dataTemporarySensor[0]}]`);
                 runRoutine = false;
               }
             }
@@ -549,6 +550,7 @@ export class UserService implements OnApplicationBootstrap {
                 (dataOperatorSensor[1] && getLastSoilMoisture.moisture >= dataTemporarySensor[1]) ||
                 (!dataOperatorSensor[1] && getLastSoilMoisture.moisture <= dataTemporarySensor[1])
               ) {
+                this.logger.log(`Routine Cron Job for ${userDto.id} parameter 2 config [${getLastSoilMoisture.moisture} ${dataOperatorSensor[1] ? '>=' : '<='} ${dataTemporarySensor[1]}]`);
                 runRoutine = false;
               }
             }
@@ -565,6 +567,8 @@ export class UserService implements OnApplicationBootstrap {
           await this.mqttClient.emit<string, number[]>(topic, payload).toPromise();
 
           this.logger.log(`Routine Cron Job for ${userDto.id} run action`);
+        } else {
+          this.logger.log(`Routine Cron Job for ${userDto.id} aborted`);
         }
       }
 
