@@ -39,7 +39,7 @@ export class MqttHandlerController {
   getSensorDHTHumadity(@Payload() data: number, @Ctx() context: MqttContext) {
     this.logger.debug(data, context.getTopic());
 
-    const mcuToken = context.getTopic().toString().replace(MQTT_TOPIC_DHT_TEMPERATURE_HANDLER, '');
+    const mcuToken = context.getTopic().toString().replace(MQTT_TOPIC_DHT_HUMIDITY_HANDLER, '');
 
     this.mqttHandlerService.saveDHTHumidity(mcuToken, data);
   }
