@@ -1,7 +1,7 @@
 import { PumpAttemp } from '@base/core/entities/pump-attemp.entity';
 import { User } from '@base/core/entities/user.entity';
 import { toUserDto } from '@base/mapper';
-import { ACTION_CONFIG } from '@base/universal-config';
+import { ACTION_CONFIG, MAILGUN } from '@base/universal-config';
 import { ActionMessage } from '@base/universal-interface';
 import { comparePasswords } from '@base/utils';
 import { BadRequestException, Inject, Injectable, Logger, OnApplicationBootstrap, UnauthorizedException } from '@nestjs/common';
@@ -23,6 +23,10 @@ import { SensorSoilTemperature } from '@base/core/entities/sensor-soil-temperatu
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { PumpAction } from '@base/core/entities/pump-action.entity';
+import { NotificationField, NotificationModels, NotificationTelegram } from '../api/action/interface/pump.action.interface';
+import { TelegramService } from 'nestjs-telegram';
+import { MailgunService, EmailOptions } from '@nextnm/nestjs-mailgun';
+import admin from 'firebase-admin';
 
 @Injectable()
 export class UserService implements OnApplicationBootstrap {
@@ -38,6 +42,8 @@ export class UserService implements OnApplicationBootstrap {
 
     private schedulerRegistry: SchedulerRegistry,
     @Inject(MQTT_SERVICE) private mqttClient: ClientProxy,
+    private readonly telegram: TelegramService,
+    private mailgunService: MailgunService,
   ) { }
 
   async onApplicationBootstrap() {
@@ -384,6 +390,10 @@ export class UserService implements OnApplicationBootstrap {
       });
       await this.pumpActionRepository.save(pumpAction);
 
+      if (actionType === 1) {
+        await this.notificationSend(userDto, fromActionName, userDto.lastAction.toString());
+      }
+
       this.logger.log(`Update Pump Action for ${userDto.id} with action ${actionName} and from ${fromActionName}`);
     }
   }
@@ -580,6 +590,125 @@ export class UserService implements OnApplicationBootstrap {
     this.logger.warn(
       `Job ${name} added for at (${seconds}) seconds, (${minutes}) minutes, (${hours}) hours!`,
     );
+  }
+
+  async notificationGet(userDto: UserDto): Promise<NotificationModels> {
+    const { id } = userDto;
+    const userInDb = await this.userRepository.findOne({ 
+      where: { id } 
+    });
+
+    if (!userInDb) {
+      throw new BadRequestException('User does not exists');    
+    }
+
+    const baseReturn = {
+      email: null,
+      emailEnable: false,
+      telegramEnable: false,
+      telegram: null,
+      webPushEnable: false,
+      webPush: null
+    };
+
+    const parsedDB: NotificationField = JSON.parse(userInDb.notificationData);
+    if (!parsedDB) {
+      return baseReturn;
+    }
+
+    parsedDB.telegram = JSON.parse(parsedDB.telegram);
+    if (!parsedDB.telegram) {
+      parsedDB.telegram = null;
+    }
+    return Object.assign({}, baseReturn, parsedDB);
+  }
+
+  async notificationSave(userDto: UserDto, notificationBody: NotificationField): Promise<ActionMessage> {
+    const { id } = userDto;
+    const userInDb = await this.userRepository.findOne({ 
+      where: { id } 
+    });
+
+    if (!userInDb) {
+      throw new BadRequestException('User does not exists');    
+    }
+
+    let oldTelegramEnable = false;
+    let parsedDB: NotificationField = JSON.parse(userInDb.notificationData);
+    if (!parsedDB) {
+      parsedDB = notificationBody;
+    } else {
+      oldTelegramEnable = parsedDB.telegramEnable;
+      parsedDB = Object.assign({}, parsedDB, notificationBody);
+    }
+    if (oldTelegramEnable !== parsedDB.telegramEnable && parsedDB.telegramEnable) {
+      const parsedData: NotificationTelegram = JSON.parse(parsedDB.telegram);
+      if (parsedData !== null) {
+        await this.telegram.sendMessage({
+          chat_id: parsedData.id,
+          text: `Hi ${userDto.username}, your account was enabled a notification from smart garden system`
+        }).toPromise();
+      }
+    }
+    userInDb.notificationData = JSON.stringify(parsedDB);
+
+    await this.userRepository.save(userInDb);
+    return {
+      message: 'Notification saved'
+    }
+  }
+
+  async notificationSend(userDto: UserDto, from: string, date: string): Promise<boolean> {
+    const parsedDB: NotificationField = JSON.parse(userDto.notificationData);
+    if (!parsedDB) {
+      return false;
+    }
+
+    // Email
+    if (parsedDB.emailEnable && parsedDB.email !== null) {
+      const options: EmailOptions = {
+        from: MAILGUN.from,
+        to: parsedDB.email,
+        subject: 'Flushing Alert',
+        template: 'smart-garden-alert',
+        'h:X-Mailgun-Variables': `{"username":"${userDto.username}","flush_from":"${from}","flush_date":"${date}","copyright":"2021 Smart Garden System"}`
+      };
+
+      await this.mailgunService.sendEmail(options);
+    }
+
+    // Telegram
+    if (parsedDB.telegramEnable && parsedDB.telegram !== null) {
+      const parsedData: NotificationTelegram = JSON.parse(parsedDB.telegram);
+      if (parsedData !== null) {
+        await this.telegram.sendMessage({
+          chat_id: parsedData.id,
+          text: `Hi ${userDto.username}, flushing active from ${from}`
+        }).toPromise();
+      }
+    }
+
+    // FCM
+    if (parsedDB.webPushEnable && parsedDB.webPush !== null) {
+      const registrationToken = parsedDB.webPush;
+
+      const message = {
+        data: {
+          title: 'Flushing Alert',
+          body: `Activate flush from ${from}`
+        },
+        token: registrationToken
+      };
+
+      try {
+        const fcmResponse = await admin.messaging().send(message);
+        console.log('Successfully sent message:', fcmResponse);
+      } catch (error) {
+        console.log('Error sending message:', error);
+      }
+    }
+
+    return true;
   }
 
   private deleteCron(name: string) {

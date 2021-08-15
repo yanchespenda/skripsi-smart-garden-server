@@ -13,6 +13,9 @@ import { SensorSoilTemperature } from '@base/core/entities/sensor-soil-temperatu
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from '@base/modules/user/user.service';
 import { PumpAttemp } from '@base/core/entities/pump-attemp.entity';
+import { TelegramModule } from 'nestjs-telegram';
+import { MAILGUN, TELEGRAM_BOT } from '@base/universal-config';
+import { MailgunModule } from '@nextnm/nestjs-mailgun';
 
 @Module({
   imports: [
@@ -29,6 +32,14 @@ import { PumpAttemp } from '@base/core/entities/pump-attemp.entity';
 
       PumpAttemp,
     ]),
+    TelegramModule.forRoot({
+      botKey: TELEGRAM_BOT.token
+    }),
+    MailgunModule.forRoot({
+      DOMAIN: MAILGUN.domain,
+      API_KEY: MAILGUN.apiKey,
+      HOST: 'api.mailgun.net'
+    }),
     MqttModule,
     UserModule,
   ],

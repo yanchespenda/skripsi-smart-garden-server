@@ -75,6 +75,12 @@ export class User {
   routineTaskSkipIfExceedParameter: boolean;
   // End Pumping Action
 
+  @Column({
+    type: 'text',
+    nullable: true
+  })
+  notificationData: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

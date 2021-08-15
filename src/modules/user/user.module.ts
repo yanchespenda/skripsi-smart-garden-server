@@ -9,6 +9,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MqttModule } from '../mqtt/mqtt.module';
 import { UserService } from './user.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { TELEGRAM_BOT, MAILGUN } from '@base/universal-config';
+import { MailgunModule } from '@nextnm/nestjs-mailgun';
+import { TelegramModule } from 'nestjs-telegram';
 
 @Module({
   imports: [
@@ -22,7 +25,15 @@ import { ScheduleModule } from '@nestjs/schedule';
       SensorSoilTemperature,
     ]),
     MqttModule,
-    ScheduleModule
+    ScheduleModule,
+    TelegramModule.forRoot({
+      botKey: TELEGRAM_BOT.token
+    }),
+    MailgunModule.forRoot({
+      DOMAIN: MAILGUN.domain,
+      API_KEY: MAILGUN.apiKey,
+      HOST: 'api.mailgun.net'
+    }),
   ],
   providers: [
     UserService,

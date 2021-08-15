@@ -16,7 +16,8 @@ export const toUserDto = (data: User): UserDto => {
     lastAction,
     routineTaskEnable,
     routineTaskSkipIfExceedParameter,
-    routineTaskTime
+    routineTaskTime,
+    notificationData
   } = data;
 
   const userDto: UserDto = {
@@ -30,7 +31,8 @@ export const toUserDto = (data: User): UserDto => {
     lastAction,
     routineTaskEnable,
     routineTaskSkipIfExceedParameter,
-    routineTaskTime
+    routineTaskTime,
+    notificationData
   };
 
   return userDto;

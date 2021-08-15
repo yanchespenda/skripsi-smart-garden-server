@@ -4,7 +4,8 @@ import { ValidateInputPipe } from './core/pipes/validate.pipe';
 import * as rateLimit from 'express-rate-limit';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import * as dotenv from 'dotenv';
-import { MQTT_CONFIG } from './universal-config';
+import { FIREBASE_ADMIN, MQTT_CONFIG } from './universal-config';
+import admin, { ServiceAccount } from 'firebase-admin';
 dotenv.config();
 
 async function bootstrap() {
@@ -36,6 +37,18 @@ async function bootstrap() {
       password: MQTT_CONFIG.password,
       protocol: (MQTT_CONFIG.protocol) as any,
     },
+  });
+
+  // Set the config options
+  const adminConfig: ServiceAccount = {
+    "projectId": FIREBASE_ADMIN.projectId, 
+    "privateKey": FIREBASE_ADMIN.privateKey.replace(/\\n/g, '\n'),
+    "clientEmail": FIREBASE_ADMIN.clientEmail,
+  };
+  // Initialize the firebase admin app
+  admin.initializeApp({
+    credential: admin.credential.cert(adminConfig),
+    databaseURL: FIREBASE_ADMIN.databaseURL
   });
 
   await app.startAllMicroservicesAsync();

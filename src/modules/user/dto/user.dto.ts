@@ -34,5 +34,8 @@ export class UserDto {
   routineTaskTime: string;
 
   @IsNotEmpty()
+  notificationData: string;
+
+  @IsNotEmpty()
   routineTaskSkipIfExceedParameter: boolean;
 }

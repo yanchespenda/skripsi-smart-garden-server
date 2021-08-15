@@ -5,7 +5,8 @@ import { Body, Controller, Get, Inject, Post, Query, Req, UseGuards } from '@nes
 import { ClientProxy } from '@nestjs/microservices';
 import { AuthGuard } from '@nestjs/passport';
 import { ActionService } from './action.service';
-import { PumpActionDto } from './interface/pump.action.interface';
+import { NotificationField, NotificationFieldDto,
+  NotificationTelegramInit, PumpActionDto } from './interface/pump.action.interface';
 import { PumpSettingAutomation, PumpSettingAutomationDto, PumpSettingRoutimeDto } from './interface/pump.setting.interface';
 
 @Controller()
@@ -72,5 +73,36 @@ export class ActionController {
   @UseGuards(AuthGuard())
   public async settingRoutine(@Req() req: any, @Body() body: PumpSettingRoutimeDto): Promise<any> {
     return await this.actionService.saveSettingRoutime(req.user, body);
+  }
+
+  /**
+   * Notifications
+   */
+
+  /**
+   * Get all notification
+   */
+  @Get('notifications')
+  @UseGuards(AuthGuard())
+  public async notificationGet(@Req() req: any): Promise<any> {
+    return await this.actionService.notificationGet(req.user);
+  }
+
+  /**
+   * Set all notification
+   */
+  @Post('notifications')
+  @UseGuards(AuthGuard())
+  public async notificationsave(@Req() req: any, @Body() body: NotificationFieldDto): Promise<any> {
+    return await this.actionService.notificationSave(req.user, body);
+  }
+
+  /**
+   * Set telegram notification
+   */
+  @Post('notifications-telegram-init')
+  @UseGuards(AuthGuard())
+  public async notificationTelegramInit(@Req() req: any, @Body() body: NotificationTelegramInit): Promise<any> {
+    return await this.actionService.notificationTelegramInit(req.user, body.userId);
   }
 }
