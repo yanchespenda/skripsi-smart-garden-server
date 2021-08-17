@@ -76,7 +76,7 @@ export class SensorController {
 
         let datasets: ChartJsFormatDatasets = {
           data: [],
-          label: 'Humidity'
+          label: 'Nilai'
         }
         getData.forEach(item => {
           datasets.data.push(item.humidity);

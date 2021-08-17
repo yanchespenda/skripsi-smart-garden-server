@@ -12,6 +12,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TELEGRAM_BOT, MAILGUN } from '@base/universal-config';
 import { MailgunModule } from '@nextnm/nestjs-mailgun';
 import { TelegramModule } from 'nestjs-telegram';
+import { SensorDHTHumidity } from '@base/core/entities/sensor-dht-humidity.entity';
+import { SensorDHTTemperature } from '@base/core/entities/sensor-dht-temperature.entity';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { TelegramModule } from 'nestjs-telegram';
 
       SensorSoilMoisture,
       SensorSoilTemperature,
+      SensorDHTHumidity,
+      SensorDHTTemperature,
     ]),
     MqttModule,
     ScheduleModule,

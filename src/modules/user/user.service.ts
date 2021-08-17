@@ -27,6 +27,8 @@ import { NotificationField, NotificationModels, NotificationTelegram } from '../
 import { TelegramService } from 'nestjs-telegram';
 import { MailgunService, EmailOptions } from '@nextnm/nestjs-mailgun';
 import admin from 'firebase-admin';
+import { SensorDHTHumidity } from '@base/core/entities/sensor-dht-humidity.entity';
+import { SensorDHTTemperature } from '@base/core/entities/sensor-dht-temperature.entity';
 
 @Injectable()
 export class UserService implements OnApplicationBootstrap {
@@ -39,6 +41,8 @@ export class UserService implements OnApplicationBootstrap {
     @InjectRepository(PumpRoutine) private pumpRoutineRepository: Repository<PumpRoutine>,
     @InjectRepository(SensorSoilMoisture) private sensorSoilMoistureRepository: Repository<SensorSoilMoisture>,
     @InjectRepository(SensorSoilTemperature) private sensorSoilTemperatureRepository: Repository<SensorSoilTemperature>,
+    @InjectRepository(SensorDHTHumidity) private sensorDHTHumidityRepository: Repository<SensorDHTHumidity>,
+    @InjectRepository(SensorDHTTemperature) private sensorDHTTemperatureRepository: Repository<SensorDHTTemperature>,
 
     private schedulerRegistry: SchedulerRegistry,
     @Inject(MQTT_SERVICE) private mqttClient: ClientProxy,
@@ -709,6 +713,56 @@ export class UserService implements OnApplicationBootstrap {
     }
 
     return true;
+  }
+
+  async resetData(userDto: UserDto): Promise<any> {
+    const { id } = userDto;
+    const userInDb = await this.userRepository.findOne({ 
+      where: { id } 
+    });
+
+    if (!userInDb) {
+      throw new BadRequestException('User does not exists');    
+    }
+
+    await this.pumpAttempRepository.delete({
+      user: userDto
+    });
+    await this.pumpActionRepository.delete({
+      user: userDto
+    });
+    await this.pumpRoutineRepository.delete({
+      user: userDto
+    });
+    await this.sensorSoilMoistureRepository.delete({
+      user: userDto
+    });
+    await this.sensorSoilTemperatureRepository.delete({
+      user: userDto
+    });
+    await this.sensorDHTHumidityRepository.delete({
+      user: userDto
+    });
+    await this.sensorDHTTemperatureRepository.delete({
+      user: userDto
+    });
+
+    userInDb.mcuToken = null;
+    userInDb.automationEnable = false;
+    userInDb.notificationData = null;
+    userInDb.automationParameter = null;
+    userInDb.automationAttemp = 3;
+    userInDb.routineTaskEnable = false;
+    userInDb.routineTaskSkipIfExceedParameter = false;
+    userInDb.routineTaskTime = null;
+    userInDb.lastAction = null;
+
+
+    await this.userRepository.save(userInDb);
+
+    return {
+      message: 'Data reseted'
+    };
   }
 
   private deleteCron(name: string) {

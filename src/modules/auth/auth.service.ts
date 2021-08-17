@@ -96,7 +96,15 @@ export class AuthService {
     try {
       return await this.usersService.changePassword(userDto, passwordUserDto);
     } catch (error) {
-      throw new BadRequestException(error.response);
+      throw new BadRequestException(error || error.message || error.response || 'Something went wrong');
+    }
+  }
+
+  async resetData(userDto: UserDto): Promise<ActionMessage> {
+    try {
+      return await this.usersService.resetData(userDto);
+    } catch (error) {
+      throw new BadRequestException(error || error.message || error.response || 'Something went wrong');
     }
   }
 

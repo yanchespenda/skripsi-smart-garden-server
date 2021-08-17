@@ -61,4 +61,10 @@ export class AuthController {
   public async createMcuToken(@Req() req: any): Promise<McuToken> {
     return await this.authService.createMcuToken(req.user);
   }
+
+  @Post('reset-data')
+  @UseGuards(AuthGuard())
+  public async resetData(@Req() req: any): Promise<ActionMessage> {
+    return await this.authService.resetData(req.user);
+  }
 }
